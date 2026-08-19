@@ -4,10 +4,12 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getUsuarioAtual } from "@/lib/auth/session";
 import { clienteSchema } from "@/lib/validations/cliente";
+import type { Cliente } from "@/types/domain";
 
 export interface ClienteActionState {
   erro?: string;
   sucesso?: boolean;
+  cliente?: Cliente;
 }
 
 function extrairDados(formData: FormData) {
@@ -33,14 +35,16 @@ export async function criarCliente(
 
   const usuario = await getUsuarioAtual();
   const supabase = await createClient();
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("clientes")
-    .insert({ ...parsed.data, created_by: usuario?.id ?? null });
+    .insert({ ...parsed.data, created_by: usuario?.id ?? null })
+    .select()
+    .single();
 
   if (error) return { erro: "Não foi possível salvar o cliente." };
 
   revalidatePath("/gestao/clientes");
-  return { sucesso: true };
+  return { sucesso: true, cliente: data };
 }
 
 export async function atualizarCliente(

@@ -1,7 +1,8 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { Button } from "@/components/ui/Button";
+import { NovoClienteModal } from "@/components/clientes/NovoClienteModal";
 import type { Cliente, Evento } from "@/types/domain";
 import type { ContratoActionState } from "@/app/gestao/contratos/actions";
 
@@ -27,8 +28,13 @@ interface ContratoFormProps {
 
 const estadoInicial: ContratoActionState = {};
 
-export function ContratoForm({ clientes, eventos, propostaId, dadosPuxados, action }: ContratoFormProps) {
+export function ContratoForm({ clientes: clientesIniciais, eventos, propostaId, dadosPuxados, action }: ContratoFormProps) {
   const [state, formAction, pending] = useActionState(action, estadoInicial);
+  const [clientes, setClientes] = useState(clientesIniciais);
+  const [clienteId, setClienteId] = useState(dadosPuxados?.cliente_id ?? "");
+  const [contratanteNome, setContratanteNome] = useState(dadosPuxados?.contratante_nome ?? "");
+  const [contratanteDocumento, setContratanteDocumento] = useState(dadosPuxados?.contratante_documento ?? "");
+  const [contratanteEndereco, setContratanteEndereco] = useState(dadosPuxados?.contratante_endereco ?? "");
 
   return (
     <form action={formAction} className="flex flex-col gap-5">
@@ -38,19 +44,31 @@ export function ContratoForm({ clientes, eventos, propostaId, dadosPuxados, acti
         <label htmlFor="cliente_id" className="text-sm font-medium text-preto">
           Cliente salvo (opcional)
         </label>
-        <select
-          id="cliente_id"
-          name="cliente_id"
-          defaultValue={dadosPuxados?.cliente_id ?? ""}
-          className="rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
-        >
-          <option value="">Nenhum · preencher manualmente</option>
-          {clientes.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.nome}
-            </option>
-          ))}
-        </select>
+        <div className="flex gap-2">
+          <select
+            id="cliente_id"
+            name="cliente_id"
+            value={clienteId}
+            onChange={(e) => setClienteId(e.target.value)}
+            className="flex-1 rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
+          >
+            <option value="">Nenhum · preencher manualmente</option>
+            {clientes.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.nome}
+              </option>
+            ))}
+          </select>
+          <NovoClienteModal
+            onCriado={(cliente) => {
+              setClientes((prev) => [...prev, cliente].sort((a, b) => a.nome.localeCompare(b.nome)));
+              setClienteId(cliente.id);
+              setContratanteNome(cliente.empresa || cliente.nome);
+              setContratanteDocumento(cliente.documento ?? "");
+              setContratanteEndereco(cliente.endereco ?? "");
+            }}
+          />
+        </div>
       </div>
 
       <div className="flex flex-col gap-1.5">
@@ -61,7 +79,8 @@ export function ContratoForm({ clientes, eventos, propostaId, dadosPuxados, acti
           id="contratante_nome"
           name="contratante_nome"
           required
-          defaultValue={dadosPuxados?.contratante_nome ?? ""}
+          value={contratanteNome}
+          onChange={(e) => setContratanteNome(e.target.value)}
           className="rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
         />
       </div>
@@ -74,7 +93,8 @@ export function ContratoForm({ clientes, eventos, propostaId, dadosPuxados, acti
           <input
             id="contratante_documento"
             name="contratante_documento"
-            defaultValue={dadosPuxados?.contratante_documento ?? ""}
+            value={contratanteDocumento}
+            onChange={(e) => setContratanteDocumento(e.target.value)}
             className="rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
           />
         </div>
@@ -105,7 +125,8 @@ export function ContratoForm({ clientes, eventos, propostaId, dadosPuxados, acti
         <input
           id="contratante_endereco"
           name="contratante_endereco"
-          defaultValue={dadosPuxados?.contratante_endereco ?? ""}
+          value={contratanteEndereco}
+          onChange={(e) => setContratanteEndereco(e.target.value)}
           className="rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
         />
       </div>
