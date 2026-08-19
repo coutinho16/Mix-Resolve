@@ -1,6 +1,7 @@
 "use client";
 
-import { ReactNode, useEffect, useRef } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 
 interface ModalProps {
@@ -12,6 +13,9 @@ interface ModalProps {
 
 export function Modal({ aberto, titulo, onFechar, children }: ModalProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const [montado, setMontado] = useState(false);
+
+  useEffect(() => setMontado(true), []);
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -21,9 +25,12 @@ export function Modal({ aberto, titulo, onFechar, children }: ModalProps) {
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [aberto, onFechar]);
 
-  if (!aberto) return null;
+  if (!aberto || !montado) return null;
 
-  return (
+  // Renderizado via portal em document.body: evita <form> aninhado dentro do
+  // formulário da tela que abriu o modal (HTML inválido e causa de bugs de
+  // validação/submit quando o modal contém seu próprio <form>).
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-preto/40 px-4"
       onClick={(e) => {
@@ -48,6 +55,7 @@ export function Modal({ aberto, titulo, onFechar, children }: ModalProps) {
         </div>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
