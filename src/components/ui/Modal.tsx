@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 
@@ -11,11 +11,20 @@ interface ModalProps {
   children: ReactNode;
 }
 
+const semInscricao = () => () => {};
+
+/** True somente após a hidratação no cliente, sem disparar setState dentro de um effect. */
+function useMontadoNoCliente() {
+  return useSyncExternalStore(
+    semInscricao,
+    () => true,
+    () => false
+  );
+}
+
 export function Modal({ aberto, titulo, onFechar, children }: ModalProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const [montado, setMontado] = useState(false);
-
-  useEffect(() => setMontado(true), []);
+  const montado = useMontadoNoCliente();
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {

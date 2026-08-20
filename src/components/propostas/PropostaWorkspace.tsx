@@ -235,76 +235,100 @@ export function PropostaWorkspace({
                     />
                   </div>
 
-                  <div className="flex flex-col gap-3 rounded-xl border border-dashed border-neutro-2 p-3">
-                    <div className="flex flex-col gap-1.5">
-                      <label htmlFor="submodo_precificacao" className="text-sm font-medium text-preto">
-                        Tipo de proposta
-                      </label>
-                      <select
-                        id="submodo_precificacao"
-                        name="submodo_precificacao"
-                        value={submodo}
-                        onChange={(e) => setSubmodo(e.target.value as SubmodoPrecificacao)}
-                        className="rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
-                      >
-                        <option value="item">Preço por item</option>
-                        <option value="setor">Valor por setor</option>
-                        <option value="unico">Valor total único</option>
-                      </select>
-                    </div>
+                </div>
 
-                    {submodo === "unico" && (
-                      <div className="flex flex-col gap-1.5">
-                        <label htmlFor="valor_manual" className="text-sm font-medium text-preto">
-                          Valor final da proposta (R$)
-                        </label>
-                        <input
-                          id="valor_manual"
-                          name="valor_manual"
-                          type="number"
-                          step="0.01"
-                          min={0}
-                          defaultValue={proposta.valor_manual ?? ""}
-                          className="w-40 rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
-                        />
-                      </div>
-                    )}
-
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                      <div className="flex flex-col gap-1.5">
-                        <label htmlFor="desconto_tipo" className="text-sm font-medium text-preto">
-                          Desconto
-                        </label>
-                        <select
-                          id="desconto_tipo"
-                          name="desconto_tipo"
-                          value={descontoTipo}
-                          onChange={(e) => setDescontoTipo(e.target.value as DescontoTipo)}
-                          className="rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
+                <div className={aba === "equipamentos" ? "flex flex-col gap-3 rounded-xl border border-neutro-2 p-3" : "hidden"}>
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-sm font-medium text-preto">Tipo de proposta</span>
+                    <div className="flex gap-2 rounded-xl border border-neutro-2 bg-branco-puro p-1">
+                      {(
+                        [
+                          ["item", "Preço por item"],
+                          ["setor", "Valor por setor"],
+                          ["unico", "Valor total único"],
+                        ] as const
+                      ).map(([valor, rotulo]) => (
+                        <button
+                          key={valor}
+                          type="button"
+                          onClick={() => setSubmodo(valor)}
+                          className={`flex-1 rounded-lg py-2 text-xs font-semibold transition-colors sm:text-sm ${
+                            submodo === valor
+                              ? "bg-laranja text-branco-puro"
+                              : "text-neutro-1 hover:text-preto"
+                          }`}
                         >
-                          <option value="nenhum">Sem desconto</option>
-                          <option value="percentual">Percentual (%)</option>
-                          <option value="valor">Valor (R$)</option>
-                        </select>
-                      </div>
-                      {descontoTipo !== "nenhum" && (
-                        <div className="flex flex-col gap-1.5">
-                          <label htmlFor="desconto_valor" className="text-sm font-medium text-preto">
-                            {descontoTipo === "percentual" ? "Percentual" : "Valor (R$)"}
-                          </label>
-                          <input
-                            id="desconto_valor"
-                            name="desconto_valor"
-                            type="number"
-                            step="0.01"
-                            min={0}
-                            defaultValue={proposta.desconto_valor}
-                            className="rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
-                          />
-                        </div>
-                      )}
+                          {rotulo}
+                        </button>
+                      ))}
                     </div>
+                    <input type="hidden" name="submodo_precificacao" value={submodo} />
                   </div>
+
+                  {submodo === "unico" && (
+                    <div className="flex flex-col gap-1.5">
+                      <label htmlFor="valor_manual" className="text-sm font-medium text-preto">
+                        Valor final da proposta (R$)
+                      </label>
+                      <input
+                        id="valor_manual"
+                        name="valor_manual"
+                        type="number"
+                        step="0.01"
+                        min={0}
+                        defaultValue={proposta.valor_manual ?? ""}
+                        className="w-40 rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
+                      />
+                    </div>
+                  )}
+
+                  <div className="flex flex-col gap-1.5">
+                    <span className="text-sm font-medium text-preto">
+                      Desconto <span className="font-normal text-neutro-1">(aplicado sobre o valor total)</span>
+                    </span>
+                    <div className="flex gap-2 rounded-xl border border-neutro-2 bg-branco-puro p-1">
+                      {(
+                        [
+                          ["nenhum", "Sem desconto"],
+                          ["percentual", "Percentual (%)"],
+                          ["valor", "Valor (R$)"],
+                        ] as const
+                      ).map(([valor, rotulo]) => (
+                        <button
+                          key={valor}
+                          type="button"
+                          onClick={() => setDescontoTipo(valor)}
+                          className={`flex-1 rounded-lg py-2 text-xs font-semibold transition-colors sm:text-sm ${
+                            descontoTipo === valor
+                              ? "bg-laranja text-branco-puro"
+                              : "text-neutro-1 hover:text-preto"
+                          }`}
+                        >
+                          {rotulo}
+                        </button>
+                      ))}
+                    </div>
+                    <input type="hidden" name="desconto_tipo" value={descontoTipo} />
+                  </div>
+                  {descontoTipo !== "nenhum" && (
+                    <div className="flex flex-col gap-1.5">
+                      <label htmlFor="desconto_valor" className="text-sm font-medium text-preto">
+                        {descontoTipo === "percentual" ? "Percentual" : "Valor (R$)"}
+                      </label>
+                      <input
+                        id="desconto_valor"
+                        name="desconto_valor"
+                        type="number"
+                        step="0.01"
+                        min={0}
+                        defaultValue={proposta.desconto_valor}
+                        className="w-40 rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
+                      />
+                    </div>
+                  )}
+                  <p className="text-xs text-neutro-1">
+                    Clique em Salvar para aplicar o tipo de proposta e o desconto escolhidos aqui.
+                  </p>
                 </div>
 
                 <div className={aba === "textos" ? "flex flex-col gap-4" : "hidden"}>
@@ -441,13 +465,11 @@ export function PropostaWorkspace({
 
                 {state.erro && <p className="text-sm text-conflito">{state.erro}</p>}
 
-                {aba !== "equipamentos" && (
-                  <div className="flex justify-end">
-                    <Button type="submit" disabled={pending}>
-                      {pending ? "Salvando..." : "Salvar"}
-                    </Button>
-                  </div>
-                )}
+                <div className="flex justify-end">
+                  <Button type="submit" disabled={pending}>
+                    {pending ? "Salvando..." : "Salvar"}
+                  </Button>
+                </div>
               </form>
 
               <div className={aba === "equipamentos" ? "block" : "hidden"}>

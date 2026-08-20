@@ -111,7 +111,7 @@ export function ContratoWorkspace({
             ))}
           </div>
 
-          <form action={formAction} className={aba === "equipamentos" ? "hidden" : "flex flex-col gap-5"}>
+          <form action={formAction} className="flex flex-col gap-5">
             <div className={aba === "contratante" ? "flex flex-col gap-4" : "hidden"}>
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="cliente_id" className="text-sm font-medium text-preto">
@@ -218,21 +218,39 @@ export function ContratoWorkspace({
                   className="rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
                 />
               </div>
+            </div>
+
+            <div className={aba === "equipamentos" ? "flex flex-col gap-3 rounded-xl border border-neutro-2 p-3" : "hidden"}>
               <div className="flex flex-col gap-1.5">
-                <label htmlFor="submodo_valor" className="text-sm font-medium text-preto">
-                  Valores do contrato
-                </label>
-                <select
-                  id="submodo_valor"
-                  name="submodo_valor"
-                  value={submodo}
-                  onChange={(e) => setSubmodo(e.target.value as SubmodoPrecificacao)}
-                  className="rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
-                >
-                  <option value="item">Preço por item</option>
-                  <option value="setor">Por setor</option>
-                  <option value="unico">Valor geral</option>
-                </select>
+                <span className="text-sm font-medium text-preto">Valores do contrato</span>
+                <div className="flex gap-2 rounded-xl border border-neutro-2 bg-branco-puro p-1">
+                  {(
+                    [
+                      ["unico", "Valor geral"],
+                      ["setor", "Por setor"],
+                      ["item", "Preço por item"],
+                    ] as const
+                  ).map(([valor, rotulo]) => (
+                    <button
+                      key={valor}
+                      type="button"
+                      onClick={() => setSubmodo(valor)}
+                      className={`flex-1 rounded-lg py-2 text-xs font-semibold transition-colors sm:text-sm ${
+                        submodo === valor
+                          ? "bg-laranja text-branco-puro"
+                          : "text-neutro-1 hover:text-preto"
+                      }`}
+                    >
+                      {rotulo}
+                    </button>
+                  ))}
+                </div>
+                <input type="hidden" name="submodo_valor" value={submodo} />
+                <p className="text-xs text-neutro-1">
+                  Valor geral: total único definido na aba Pagamento. Por setor: um valor fechado
+                  por setor. Preço por item: valor de cada equipamento. Nos dois últimos o total é
+                  a soma. Clique em Salvar para aplicar.
+                </p>
               </div>
             </div>
 

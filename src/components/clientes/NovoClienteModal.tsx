@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useState } from "react";
 import { UserPlus } from "lucide-react";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
@@ -17,13 +17,17 @@ export function NovoClienteModal({ onCriado }: NovoClienteModalProps) {
   const [aberto, setAberto] = useState(false);
   const [state, formAction, pending] = useActionState(criarCliente, estadoInicial);
 
-  useEffect(() => {
+  // Reage ao resultado da server action durante a própria renderização (não em um
+  // effect), seguindo o padrão recomendado pelo React para sincronizar estado a
+  // partir de uma mudança detectada por comparação de referência.
+  const [ultimoStateVisto, setUltimoStateVisto] = useState(state);
+  if (state !== ultimoStateVisto) {
+    setUltimoStateVisto(state);
     if (state.sucesso && state.cliente) {
       onCriado(state.cliente);
       setAberto(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state]);
+  }
 
   return (
     <>
