@@ -45,6 +45,8 @@ export function FinanceiroForm({
   const [clienteId, setClienteId] = useState(dadosPuxados?.cliente_id ?? "");
   const [clienteNome, setClienteNome] = useState(dadosPuxados?.cliente_nome ?? "");
   const [clienteDocumento, setClienteDocumento] = useState(dadosPuxados?.cliente_documento ?? "");
+  const [clienteEndereco, setClienteEndereco] = useState("");
+  const ehFatura = tipo === "fatura";
 
   return (
     <form action={formAction} className="flex flex-col gap-5">
@@ -54,7 +56,7 @@ export function FinanceiroForm({
       {dadosPuxados?.contrato_id && (
         <input type="hidden" name="contrato_id" value={dadosPuxados.contrato_id} />
       )}
-      {itensPuxados.length > 0 && (
+      {ehFatura && itensPuxados.length > 0 && (
         <input type="hidden" name="itens_puxados" value={JSON.stringify(itensPuxados)} />
       )}
 
@@ -108,6 +110,7 @@ export function FinanceiroForm({
               setClienteId(cliente.id);
               setClienteNome(cliente.empresa || cliente.nome);
               setClienteDocumento(cliente.documento ?? "");
+              setClienteEndereco(cliente.endereco ?? "");
             }}
           />
         </div>
@@ -140,6 +143,78 @@ export function FinanceiroForm({
         </div>
       </div>
 
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="cliente_endereco" className="text-sm font-medium text-preto">
+          Endereço completo do tomador
+        </label>
+        <input
+          id="cliente_endereco"
+          name="cliente_endereco"
+          value={clienteEndereco}
+          onChange={(e) => setClienteEndereco(e.target.value)}
+          className="rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
+        />
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="cliente_telefone" className="text-sm font-medium text-preto">
+            Telefone do tomador
+          </label>
+          <input
+            id="cliente_telefone"
+            name="cliente_telefone"
+            className="rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
+          />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="cliente_email" className="text-sm font-medium text-preto">
+            E-mail do tomador
+          </label>
+          <input
+            id="cliente_email"
+            name="cliente_email"
+            className="rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
+          />
+        </div>
+      </div>
+
+      {ehFatura ? (
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="cliente_inscricao_municipal" className="text-sm font-medium text-preto">
+            Inscrição municipal do tomador (opcional)
+          </label>
+          <input
+            id="cliente_inscricao_municipal"
+            name="cliente_inscricao_municipal"
+            className="rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
+          />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="cliente_inscricao_estadual" className="text-sm font-medium text-preto">
+              Inscrição estadual (opcional)
+            </label>
+            <input
+              id="cliente_inscricao_estadual"
+              name="cliente_inscricao_estadual"
+              className="rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="cliente_responsavel" className="text-sm font-medium text-preto">
+              Responsável (opcional)
+            </label>
+            <input
+              id="cliente_responsavel"
+              name="cliente_responsavel"
+              className="rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
+            />
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
           <label htmlFor="numero" className="text-sm font-medium text-preto">
@@ -164,17 +239,62 @@ export function FinanceiroForm({
         </div>
       </div>
 
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="descricao" className="text-sm font-medium text-preto">
-          Descrição
-        </label>
-        <input
-          id="descricao"
-          name="descricao"
-          defaultValue={dadosPuxados?.descricao ?? ""}
-          className="rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
-        />
-      </div>
+      {ehFatura && (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="numero_substituicao" className="text-sm font-medium text-preto">
+              Número da substituição (opcional)
+            </label>
+            <input
+              id="numero_substituicao"
+              name="numero_substituicao"
+              className="rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="data_entrega" className="text-sm font-medium text-preto">
+              Data da entrega
+            </label>
+            <input
+              id="data_entrega"
+              name="data_entrega"
+              placeholder="ex.: 06 a 09/08/2026"
+              className="rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
+            />
+          </div>
+        </div>
+      )}
+
+      {!ehFatura && (
+        <>
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="valor_total" className="text-sm font-medium text-preto">
+              Valor (R$)
+            </label>
+            <input
+              id="valor_total"
+              name="valor_total"
+              type="number"
+              step="0.01"
+              min={0}
+              defaultValue={dadosPuxados?.valor_total ?? 0}
+              className="w-40 rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="descricao" className="text-sm font-medium text-preto">
+              Descrição · referente a
+            </label>
+            <input
+              id="descricao"
+              name="descricao"
+              defaultValue={dadosPuxados?.descricao ?? ""}
+              placeholder="ex.: prestação de serviços de locação de estruturas para o evento X"
+              className="rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
+            />
+          </div>
+        </>
+      )}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
@@ -228,7 +348,7 @@ export function FinanceiroForm({
         />
       </div>
 
-      {dadosPuxados && dadosPuxados.valor_total > 0 && (
+      {ehFatura && dadosPuxados && dadosPuxados.valor_total > 0 && (
         <input type="hidden" name="valor_total" value={dadosPuxados.valor_total} />
       )}
 

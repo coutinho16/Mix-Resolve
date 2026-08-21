@@ -23,9 +23,16 @@ interface FinanceiroResumoProps {
   status: StatusFinanceiro;
   itens: FinanceiroItem[];
   valorTotal: number;
+  mostrarItens: boolean;
 }
 
-export function FinanceiroResumo({ financeiroId, status, itens, valorTotal }: FinanceiroResumoProps) {
+export function FinanceiroResumo({
+  financeiroId,
+  status,
+  itens,
+  valorTotal,
+  mostrarItens,
+}: FinanceiroResumoProps) {
   const [pending, startTransition] = useTransition();
   const totalItens = itens.reduce((acc, i) => acc + i.quantidade, 0);
 
@@ -33,29 +40,32 @@ export function FinanceiroResumo({ financeiroId, status, itens, valorTotal }: Fi
     <Card className="sticky top-6 flex flex-col gap-4 p-5">
       <div className="flex items-center justify-between">
         <h2 className="font-titulo text-base font-semibold text-preto">Resumo</h2>
-        <span className="rounded-full bg-laranja/10 px-2.5 py-1 text-xs font-bold text-laranja">
-          {totalItens} {totalItens === 1 ? "item" : "itens"}
-        </span>
+        {mostrarItens && (
+          <span className="rounded-full bg-laranja/10 px-2.5 py-1 text-xs font-bold text-laranja">
+            {totalItens} {totalItens === 1 ? "item" : "itens"}
+          </span>
+        )}
       </div>
 
-      {itens.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-neutro-2 px-3 py-6 text-center text-sm text-neutro-1">
-          Nenhum item adicionado ainda.
-        </p>
-      ) : (
-        <div className="flex max-h-72 flex-col gap-1.5 overflow-y-auto pr-1">
-          {itens.map((item) => (
-            <div
-              key={item.id}
-              className="flex items-center justify-between border-b border-dashed border-neutro-2 pb-1 text-xs last:border-0"
-            >
-              <span className="text-preto">
-                {item.descricao || "(sem descrição)"} <span className="text-neutro-1">x{item.quantidade}</span>
-              </span>
-            </div>
-          ))}
-        </div>
-      )}
+      {mostrarItens &&
+        (itens.length === 0 ? (
+          <p className="rounded-lg border border-dashed border-neutro-2 px-3 py-6 text-center text-sm text-neutro-1">
+            Nenhum item adicionado ainda.
+          </p>
+        ) : (
+          <div className="flex max-h-72 flex-col gap-1.5 overflow-y-auto pr-1">
+            {itens.map((item) => (
+              <div
+                key={item.id}
+                className="flex items-center justify-between border-b border-dashed border-neutro-2 pb-1 text-xs last:border-0"
+              >
+                <span className="text-preto">
+                  {item.descricao || "(sem descrição)"} <span className="text-neutro-1">x{item.quantidade}</span>
+                </span>
+              </div>
+            ))}
+          </div>
+        ))}
 
       <div className="flex items-center justify-between rounded-xl bg-preto px-4 py-3">
         <span className="text-xs font-semibold uppercase tracking-wide text-branco/70">Total</span>

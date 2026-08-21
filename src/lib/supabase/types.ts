@@ -386,9 +386,17 @@ export interface Database {
           cliente_id: string | null;
           cliente_nome: string | null;
           cliente_documento: string | null;
+          cliente_endereco: string | null;
+          cliente_telefone: string | null;
+          cliente_email: string | null;
+          cliente_inscricao_municipal: string | null;
+          cliente_inscricao_estadual: string | null;
+          cliente_responsavel: string | null;
           proposta_id: string | null;
           contrato_id: string | null;
           descricao: string | null;
+          data_entrega: string | null;
+          numero_substituicao: string | null;
           valor_total: number;
           forma_pagamento: string | null;
           vencimento: string | null;
