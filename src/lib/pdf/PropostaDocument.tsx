@@ -14,6 +14,12 @@ const LINE = "#E7E1D7";
 const styles = StyleSheet.create({
   page: { paddingTop: 32, paddingBottom: 26, paddingHorizontal: 18, fontSize: 9.5, color: INK, fontFamily: "Helvetica" },
   topband: { position: "absolute", top: 0, left: 0, right: 0, height: 4, backgroundColor: ORANGE },
+  marcaDagua: {
+    position: "absolute",
+    top: "32%",
+    left: "18%",
+    width: "64%",
+  },
   footer: {
     position: "absolute",
     bottom: 10,
@@ -186,10 +192,13 @@ export function PropostaDocument({ proposta, cliente, itens }: PropostaDocumentP
     paresInfo.push([infoLinhas[i], infoLinhas[i + 1] ?? null]);
   }
 
+  const marcaDagua = assetSeExistir("marca-dagua.png");
+
   return (
     <Document>
       <Page size="A4" style={styles.page} wrap>
         <View style={styles.topband} fixed />
+        {marcaDagua && <Image src={marcaDagua} style={styles.marcaDagua} fixed />}
 
         <View style={styles.header}>
           <View>
