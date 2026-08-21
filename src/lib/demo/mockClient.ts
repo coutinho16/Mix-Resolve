@@ -23,12 +23,15 @@ const tables: Record<string, Record<string, unknown>[]> = {
   contratos: store.contratos as unknown as Record<string, unknown>[],
   contrato_itens: store.contratoItens as unknown as Record<string, unknown>[],
   contrato_setores_valor: store.contratoSetoresValor as unknown as Record<string, unknown>[],
+  financeiro: store.financeiro as unknown as Record<string, unknown>[],
+  financeiro_itens: store.financeiroItens as unknown as Record<string, unknown>[],
 };
 
 const fkMap: Record<string, Record<string, { column: string; table: string }>> = {
   eventos: { clientes: { column: "cliente_id", table: "clientes" } },
   propostas: { clientes: { column: "cliente_id", table: "clientes" } },
   contratos: { clientes: { column: "cliente_id", table: "clientes" } },
+  financeiro: { clientes: { column: "cliente_id", table: "clientes" } },
   evento_equipe: { eventos: { column: "evento_id", table: "eventos" } },
 };
 
@@ -92,6 +95,17 @@ function defaultsFor(table: string): Record<string, unknown> {
       return { valor: 0 };
     case "checklist_itens":
       return { quantidade_avariada: 0, status: "pendente" };
+    case "financeiro":
+      return {
+        data_emissao: agora.slice(0, 10),
+        valor_total: 0,
+        status: "rascunho",
+        numero_controle: proximoNumeroControle(store.financeiro as unknown as Record<string, unknown>[]),
+        created_at: agora,
+        updated_at: agora,
+      };
+    case "financeiro_itens":
+      return { descricao: "", quantidade: 1, valor_unitario: 0, valor_total: 0, ordem: 0 };
     default:
       return {};
   }

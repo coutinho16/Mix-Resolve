@@ -11,6 +11,8 @@ import type {
   Evento,
   EventoEquipamento,
   EventoEquipe,
+  Financeiro,
+  FinanceiroItem,
   Proposta,
   PropostaItem,
   PropostaSetorValor,
@@ -383,3 +385,7 @@ export const contratoItens: ContratoItem[] = [
 ];
 
 export const contratoSetoresValor: ContratoSetorValor[] = [];
+
+// ---- financeiro (faturas e recibos, vazio por padrão no demo) ----
+export const financeiro: Financeiro[] = [];
+export const financeiroItens: FinanceiroItem[] = [];

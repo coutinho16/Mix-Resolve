@@ -27,6 +27,8 @@ export type TipoValorItem = "diaria" | "fechado";
 export type SubmodoPrecificacao = "item" | "setor" | "unico";
 export type DescontoTipo = "nenhum" | "percentual" | "valor";
 export type TipoContratacao = "pagamento" | "permuta";
+export type TipoFinanceiro = "fatura" | "recibo";
+export type StatusFinanceiro = "rascunho" | "emitido" | "pago" | "cancelado";
 export interface Parcela {
   valor: number;
   vencimento: string;
@@ -371,6 +373,55 @@ export interface Database {
         > & { contrato_id: string; setor: string };
         Update: Partial<
           Database["public"]["Tables"]["contrato_setores_valor"]["Row"]
+        >;
+        Relationships: [];
+      };
+      financeiro: {
+        Row: {
+          id: string;
+          tipo: TipoFinanceiro;
+          numero: string | null;
+          numero_controle: number;
+          data_emissao: string;
+          cliente_id: string | null;
+          cliente_nome: string | null;
+          cliente_documento: string | null;
+          proposta_id: string | null;
+          contrato_id: string | null;
+          descricao: string | null;
+          valor_total: number;
+          forma_pagamento: string | null;
+          vencimento: string | null;
+          observacoes: string | null;
+          signatario: Assinante | null;
+          status: StatusFinanceiro;
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["financeiro"]["Row"]> & {
+          tipo: TipoFinanceiro;
+        };
+        Update: Partial<Database["public"]["Tables"]["financeiro"]["Row"]>;
+        Relationships: [];
+      };
+      financeiro_itens: {
+        Row: {
+          id: string;
+          financeiro_id: string;
+          descricao: string;
+          quantidade: number;
+          valor_unitario: number;
+          valor_total: number;
+          ordem: number;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["financeiro_itens"]["Row"]
+        > & {
+          financeiro_id: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["financeiro_itens"]["Row"]
         >;
         Relationships: [];
       };

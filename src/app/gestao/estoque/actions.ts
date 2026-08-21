@@ -75,3 +75,9 @@ export async function excluirEquipamento(id: string) {
   await supabase.from("equipamentos").update({ ativo: false }).eq("id", id);
   revalidatePath("/gestao/estoque");
 }
+
+export async function reativarEquipamento(id: string) {
+  const supabase = await createClient();
+  await supabase.from("equipamentos").update({ ativo: true }).eq("id", id);
+  revalidatePath("/gestao/estoque");
+}

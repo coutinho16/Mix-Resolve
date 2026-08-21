@@ -23,6 +23,9 @@ export type ContratoItem =
   Database["public"]["Tables"]["contrato_itens"]["Row"];
 export type ContratoSetorValor =
   Database["public"]["Tables"]["contrato_setores_valor"]["Row"];
+export type Financeiro = Database["public"]["Tables"]["financeiro"]["Row"];
+export type FinanceiroItem =
+  Database["public"]["Tables"]["financeiro_itens"]["Row"];
 
 export type {
   PerfilUsuario,
@@ -40,4 +43,6 @@ export type {
   DescontoTipo,
   TipoContratacao,
   Parcela,
+  TipoFinanceiro,
+  StatusFinanceiro,
 } from "@/lib/supabase/types";

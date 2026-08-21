@@ -10,6 +10,7 @@ import {
   Users,
   UserSquare,
   FileText,
+  Receipt,
   LogOut,
 } from "lucide-react";
 import { sair } from "@/lib/auth/actions";
@@ -85,6 +86,17 @@ export function NavGestao({ nome, admin }: NavGestaoProps) {
             >
               <FileText size={18} />
               Contratos
+            </Link>
+            <Link
+              href="/gestao/financeiro"
+              className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                pathname.startsWith("/gestao/financeiro")
+                  ? "bg-laranja/10 text-laranja"
+                  : "text-preto hover:bg-neutro-3"
+              }`}
+            >
+              <Receipt size={18} />
+              Financeiro
             </Link>
           </>
         )}

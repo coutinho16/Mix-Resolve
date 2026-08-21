@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Pencil, EyeOff } from "lucide-react";
+import { Plus, Pencil, EyeOff, Eye } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Modal } from "@/components/ui/Modal";
@@ -13,6 +13,7 @@ import {
   criarEquipamento,
   atualizarEquipamento,
   excluirEquipamento,
+  reativarEquipamento,
 } from "@/app/gestao/estoque/actions";
 
 interface EstoquePainelProps {
@@ -142,6 +143,51 @@ export function EstoquePainel({ categorias, equipamentos }: EstoquePainelProps) 
           </div>
         );
       })}
+
+      {(() => {
+        const ocultos = equipamentos.filter((e) => !e.ativo);
+        if (ocultos.length === 0) return null;
+        return (
+          <div className="flex flex-col gap-3">
+            <h2 className="font-titulo text-sm font-semibold uppercase tracking-wide text-neutro-1">
+              Equipamentos ocultos
+            </h2>
+            <Card className="overflow-x-auto p-0">
+              <table className="w-full min-w-[480px] text-left text-sm">
+                <thead className="border-b border-neutro-2 text-neutro-1">
+                  <tr>
+                    <th className="px-4 py-3 font-medium">Equipamento</th>
+                    <th className="px-4 py-3 font-medium">Categoria</th>
+                    <th className="px-4 py-3"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ocultos.map((e) => (
+                    <tr key={e.id} className="border-b border-neutro-2 last:border-0">
+                      <td className="px-4 py-3 font-medium text-neutro-1">{e.nome}</td>
+                      <td className="px-4 py-3 text-neutro-1">
+                        {categorias.find((c) => c.id === e.categoria_id)?.nome ?? "-"}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex justify-end">
+                          <button
+                            onClick={() => reativarEquipamento(e.id)}
+                            aria-label="Reativar"
+                            className="flex items-center gap-1.5 rounded p-1.5 text-xs font-medium text-neutro-1 hover:bg-disponivel/10 hover:text-disponivel"
+                          >
+                            <Eye size={16} />
+                            Reativar
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </Card>
+          </div>
+        );
+      })()}
 
       <Modal
         aberto={modal !== null}
