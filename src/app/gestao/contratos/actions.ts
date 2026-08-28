@@ -228,8 +228,10 @@ export async function atualizarStatusContrato(
   status: "gerado" | "assinado" | "cancelado"
 ) {
   const supabase = await createClient();
-  const patch: { status: typeof status; assinado_em?: string } = { status };
-  if (status === "assinado") patch.assinado_em = new Date().toISOString();
+  const patch: { status: typeof status; assinado_em: string | null } = {
+    status,
+    assinado_em: status === "assinado" ? new Date().toISOString() : null,
+  };
   await supabase.from("contratos").update(patch).eq("id", contratoId);
   revalidatePath(`/gestao/contratos/${contratoId}`);
 }

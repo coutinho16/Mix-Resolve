@@ -1,7 +1,8 @@
 "use client";
 
 import { useTransition } from "react";
-import { Download } from "lucide-react";
+import Link from "next/link";
+import { Download, Receipt } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Chip } from "@/components/ui/Chip";
@@ -78,6 +79,13 @@ export function ContratoResumo({ contratoId, status, itens, valorTotal, ehPermut
         </Button>
       </a>
 
+      <Link href={`/gestao/financeiro/novo?contratoId=${contratoId}`}>
+        <Button type="button" variant="secondary" className="w-full">
+          <Receipt size={16} />
+          Gerar fatura ou recibo
+        </Button>
+      </Link>
+
       <div className="flex flex-wrap items-center gap-2 border-t border-neutro-2 pt-4">
         <Chip estado={status === "assinado" ? "disponivel" : "em-uso"} texto={rotulo[status]} />
         {status === "gerado" && (
@@ -88,6 +96,28 @@ export function ContratoResumo({ contratoId, status, itens, valorTotal, ehPermut
             onClick={() => startTransition(() => atualizarStatusContrato(contratoId, "assinado"))}
           >
             Marcar como assinado
+          </Button>
+        )}
+        {status === "assinado" && (
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={pending}
+            className="text-xs"
+            onClick={() => startTransition(() => atualizarStatusContrato(contratoId, "gerado"))}
+          >
+            Desfazer assinatura
+          </Button>
+        )}
+        {status === "cancelado" && (
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={pending}
+            className="text-xs"
+            onClick={() => startTransition(() => atualizarStatusContrato(contratoId, "gerado"))}
+          >
+            Reativar contrato
           </Button>
         )}
         {status !== "cancelado" && (

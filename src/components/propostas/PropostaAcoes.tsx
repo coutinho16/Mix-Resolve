@@ -64,7 +64,40 @@ export function PropostaAcoes({
           >
             Marcar como recusada
           </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={pending}
+            className="text-xs"
+            onClick={() => startTransition(() => atualizarStatusProposta(propostaId, "rascunho"))}
+          >
+            Voltar para rascunho
+          </Button>
         </>
+      )}
+
+      {status === "aceita" && (
+        <Button
+          type="button"
+          variant="secondary"
+          disabled={pending}
+          className="text-xs"
+          onClick={() => startTransition(() => atualizarStatusProposta(propostaId, "enviada"))}
+        >
+          Desfazer aceite
+        </Button>
+      )}
+
+      {status === "recusada" && (
+        <Button
+          type="button"
+          variant="secondary"
+          disabled={pending}
+          className="text-xs"
+          onClick={() => startTransition(() => atualizarStatusProposta(propostaId, "enviada"))}
+        >
+          Reabrir proposta
+        </Button>
       )}
 
       {status === "aceita" && !contratoId && (
