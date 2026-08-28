@@ -3,7 +3,11 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Card } from "@/components/ui/Card";
 import { Chip } from "@/components/ui/Chip";
+import { ExcluirDocumentoBotao } from "@/components/ui/ExcluirDocumentoBotao";
 import { ClienteAnexos } from "@/components/gestao/ClienteAnexos";
+import { excluirProposta } from "@/app/gestao/propostas/actions";
+import { excluirContrato } from "@/app/gestao/contratos/actions";
+import { excluirFinanceiro } from "@/app/gestao/financeiro/actions";
 import type {
   StatusContrato,
   StatusFinanceiro,
@@ -104,10 +108,10 @@ export default async function ClienteDetalhePage({
         <h2 className="font-titulo text-lg font-semibold text-preto">Propostas</h2>
         <ul className="flex flex-col gap-2">
           {(propostas ?? []).map((p) => (
-            <li key={p.id}>
+            <li key={p.id} className="flex items-center gap-1">
               <Link
                 href={`/gestao/propostas/${p.id}`}
-                className="flex items-center justify-between rounded-lg border border-neutro-2 px-3 py-2 text-sm hover:bg-neutro-3"
+                className="flex flex-1 items-center justify-between rounded-lg border border-neutro-2 px-3 py-2 text-sm hover:bg-neutro-3"
               >
                 <span className="text-preto">
                   Proposta {p.numero_cliente ? `nº ${p.numero_cliente}` : ""}
@@ -115,6 +119,10 @@ export default async function ClienteDetalhePage({
                 </span>
                 <Chip estado={p.status === "aceita" ? "disponivel" : "em-uso"} texto={rotuloProposta[p.status]} />
               </Link>
+              <ExcluirDocumentoBotao
+                descricao="esta proposta"
+                onConfirmar={excluirProposta.bind(null, p.id, id)}
+              />
             </li>
           ))}
           {(!propostas || propostas.length === 0) && (
@@ -127,10 +135,10 @@ export default async function ClienteDetalhePage({
         <h2 className="font-titulo text-lg font-semibold text-preto">Contratos</h2>
         <ul className="flex flex-col gap-2">
           {(contratos ?? []).map((c) => (
-            <li key={c.id}>
+            <li key={c.id} className="flex items-center gap-1">
               <Link
                 href={`/gestao/contratos/${c.id}`}
-                className="flex items-center justify-between rounded-lg border border-neutro-2 px-3 py-2 text-sm hover:bg-neutro-3"
+                className="flex flex-1 items-center justify-between rounded-lg border border-neutro-2 px-3 py-2 text-sm hover:bg-neutro-3"
               >
                 <span className="text-preto">
                   Contrato {c.numero_cliente ? `nº ${c.numero_cliente}` : ""}
@@ -138,6 +146,10 @@ export default async function ClienteDetalhePage({
                 </span>
                 <Chip estado={c.status === "assinado" ? "disponivel" : "em-uso"} texto={rotuloContrato[c.status]} />
               </Link>
+              <ExcluirDocumentoBotao
+                descricao="este contrato"
+                onConfirmar={excluirContrato.bind(null, c.id, id)}
+              />
             </li>
           ))}
           {(!contratos || contratos.length === 0) && (
@@ -150,10 +162,10 @@ export default async function ClienteDetalhePage({
         <h2 className="font-titulo text-lg font-semibold text-preto">Notas de fatura e recibos</h2>
         <ul className="flex flex-col gap-2">
           {(financeiro ?? []).map((f) => (
-            <li key={f.id}>
+            <li key={f.id} className="flex items-center gap-1">
               <Link
                 href={`/gestao/financeiro/${f.id}`}
-                className="flex items-center justify-between rounded-lg border border-neutro-2 px-3 py-2 text-sm hover:bg-neutro-3"
+                className="flex flex-1 items-center justify-between rounded-lg border border-neutro-2 px-3 py-2 text-sm hover:bg-neutro-3"
               >
                 <span className="text-preto">
                   {rotuloTipoFinanceiro[f.tipo]}
@@ -162,6 +174,10 @@ export default async function ClienteDetalhePage({
                 </span>
                 <Chip estado={f.status === "pago" ? "disponivel" : "em-uso"} texto={rotuloFinanceiro[f.status]} />
               </Link>
+              <ExcluirDocumentoBotao
+                descricao={f.tipo === "fatura" ? "esta fatura" : "este recibo"}
+                onConfirmar={excluirFinanceiro.bind(null, f.id, id)}
+              />
             </li>
           ))}
           {(!financeiro || financeiro.length === 0) && (

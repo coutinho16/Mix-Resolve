@@ -215,3 +215,26 @@ export async function atualizarStatusProposta(
   await supabase.from("propostas").update({ status }).eq("id", propostaId);
   revalidatePath(`/gestao/propostas/${propostaId}`);
 }
+
+export async function excluirProposta(
+  propostaId: string,
+  clienteId?: string
+): Promise<{ erro?: string }> {
+  const supabase = await createClient();
+
+  const { data: contrato } = await supabase
+    .from("contratos")
+    .select("id")
+    .eq("proposta_id", propostaId)
+    .maybeSingle();
+  if (contrato) {
+    return { erro: "Não é possível excluir: existe um contrato vinculado a esta proposta." };
+  }
+
+  const { error } = await supabase.from("propostas").delete().eq("id", propostaId);
+  if (error) return { erro: "Não foi possível excluir a proposta." };
+
+  revalidatePath("/gestao/propostas");
+  if (clienteId) revalidatePath(`/gestao/clientes/${clienteId}`);
+  return {};
+}

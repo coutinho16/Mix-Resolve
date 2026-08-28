@@ -235,3 +235,28 @@ export async function atualizarStatusContrato(
   await supabase.from("contratos").update(patch).eq("id", contratoId);
   revalidatePath(`/gestao/contratos/${contratoId}`);
 }
+
+export async function excluirContrato(
+  contratoId: string,
+  clienteId?: string
+): Promise<{ erro?: string }> {
+  const supabase = await createClient();
+
+  const { data: financeiro } = await supabase
+    .from("financeiro")
+    .select("id")
+    .eq("contrato_id", contratoId)
+    .limit(1);
+  if (financeiro && financeiro.length > 0) {
+    return {
+      erro: "Não é possível excluir: existe uma fatura ou recibo vinculado a este contrato.",
+    };
+  }
+
+  const { error } = await supabase.from("contratos").delete().eq("id", contratoId);
+  if (error) return { erro: "Não foi possível excluir o contrato." };
+
+  revalidatePath("/gestao/contratos");
+  if (clienteId) revalidatePath(`/gestao/clientes/${clienteId}`);
+  return {};
+}

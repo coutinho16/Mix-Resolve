@@ -179,3 +179,16 @@ export async function atualizarStatusFinanceiro(
   await supabase.from("financeiro").update({ status }).eq("id", financeiroId);
   revalidatePath(`/gestao/financeiro/${financeiroId}`);
 }
+
+export async function excluirFinanceiro(
+  financeiroId: string,
+  clienteId?: string
+): Promise<{ erro?: string }> {
+  const supabase = await createClient();
+  const { error } = await supabase.from("financeiro").delete().eq("id", financeiroId);
+  if (error) return { erro: "Não foi possível excluir o registro." };
+
+  revalidatePath("/gestao/financeiro");
+  if (clienteId) revalidatePath(`/gestao/clientes/${clienteId}`);
+  return {};
+}

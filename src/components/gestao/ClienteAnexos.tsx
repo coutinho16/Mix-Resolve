@@ -1,8 +1,9 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import { Download, Paperclip, Trash2, Upload } from "lucide-react";
+import { Download, Paperclip, Upload } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { ExcluirDocumentoBotao } from "@/components/ui/ExcluirDocumentoBotao";
 import type { ClienteAnexo } from "@/types/domain";
 import { enviarAnexoCliente, excluirAnexoCliente } from "@/app/gestao/clientes/actions";
 
@@ -83,15 +84,12 @@ export function ClienteAnexos({
               >
                 <Download size={16} />
               </a>
-              <button
-                onClick={() =>
+              <ExcluirDocumentoBotao
+                descricao="este anexo"
+                onConfirmar={() =>
                   excluirAnexoCliente(clienteId, anexo.id, anexo.caminho_storage)
                 }
-                aria-label="Excluir"
-                className="rounded p-1.5 text-neutro-1 hover:bg-conflito/10 hover:text-conflito"
-              >
-                <Trash2 size={16} />
-              </button>
+              />
             </span>
           </li>
         ))}
