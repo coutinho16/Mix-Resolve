@@ -449,6 +449,47 @@ async function executarRpc(nome: string, args: Record<string, unknown> = {}) {
 // ---------------------------------------------------------------------------
 // Cliente mock (server-side, com sessão via cookie)
 // ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// Storage (arquivos guardados em memória só durante a vida do processo; some
+// ao reiniciar o servidor de demo, mas evita quebrar o fluxo de anexos)
+// ---------------------------------------------------------------------------
+const arquivosStorage = new Map<string, { bytes: Uint8Array; contentType: string }>();
+
+function chaveArquivo(bucket: string, caminho: string) {
+  return `${bucket}/${caminho}`;
+}
+
+function mockStorage() {
+  return {
+    from(bucket: string) {
+      return {
+        async upload(caminho: string, arquivo: File, opts?: { contentType?: string }) {
+          const bytes = new Uint8Array(await arquivo.arrayBuffer());
+          arquivosStorage.set(chaveArquivo(bucket, caminho), {
+            bytes,
+            contentType: opts?.contentType ?? arquivo.type ?? "application/octet-stream",
+          });
+          return { data: { path: caminho }, error: null };
+        },
+        async remove(caminhos: string[]) {
+          for (const caminho of caminhos) arquivosStorage.delete(chaveArquivo(bucket, caminho));
+          return { data: null, error: null };
+        },
+        async createSignedUrl(caminho: string, _segundos: number, opts?: { download?: string }) {
+          const arquivo = arquivosStorage.get(chaveArquivo(bucket, caminho));
+          if (!arquivo) return { data: null, error: { message: "Arquivo não encontrado." } };
+          const base64 = Buffer.from(arquivo.bytes).toString("base64");
+          void opts;
+          return {
+            data: { signedUrl: `data:${arquivo.contentType};base64,${base64}` },
+            error: null,
+          };
+        },
+      };
+    },
+  };
+}
+
 export async function createMockServerClient() {
   const cookieStore = await cookies();
   const usuarioIdAtual = cookieStore.get(DEMO_COOKIE)?.value ?? null;
@@ -460,6 +501,7 @@ export async function createMockServerClient() {
     rpc(nome: string, args?: Record<string, unknown>) {
       return executarRpc(nome, args);
     },
+    storage: mockStorage(),
     auth: {
       async getUser() {
         if (!usuarioIdAtual) return { data: { user: null }, error: null };

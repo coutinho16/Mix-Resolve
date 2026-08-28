@@ -106,3 +106,57 @@ export async function importarClientes(
   revalidatePath("/gestao/clientes");
   return { importados: registros.length };
 }
+
+const BUCKET_ANEXOS = "cliente-anexos";
+
+export interface AnexoActionState {
+  erro?: string;
+}
+
+export async function enviarAnexoCliente(
+  clienteId: string,
+  formData: FormData
+): Promise<AnexoActionState> {
+  const arquivo = formData.get("arquivo");
+  if (!(arquivo instanceof File) || arquivo.size === 0) {
+    return { erro: "Selecione um arquivo." };
+  }
+
+  const usuario = await getUsuarioAtual();
+  const supabase = await createClient();
+  const caminho = `${clienteId}/${crypto.randomUUID()}-${arquivo.name}`;
+
+  const { error: erroUpload } = await supabase.storage
+    .from(BUCKET_ANEXOS)
+    .upload(caminho, arquivo, { contentType: arquivo.type || undefined });
+
+  if (erroUpload) return { erro: "Não foi possível enviar o arquivo." };
+
+  const { error: erroInsert } = await supabase.from("cliente_anexos").insert({
+    cliente_id: clienteId,
+    nome_arquivo: arquivo.name,
+    caminho_storage: caminho,
+    tipo_conteudo: arquivo.type || null,
+    tamanho_bytes: arquivo.size,
+    created_by: usuario?.id ?? null,
+  });
+
+  if (erroInsert) {
+    await supabase.storage.from(BUCKET_ANEXOS).remove([caminho]);
+    return { erro: "Não foi possível registrar o anexo." };
+  }
+
+  revalidatePath(`/gestao/clientes/${clienteId}`);
+  return {};
+}
+
+export async function excluirAnexoCliente(
+  clienteId: string,
+  anexoId: string,
+  caminhoStorage: string
+) {
+  const supabase = await createClient();
+  await supabase.storage.from(BUCKET_ANEXOS).remove([caminhoStorage]);
+  await supabase.from("cliente_anexos").delete().eq("id", anexoId);
+  revalidatePath(`/gestao/clientes/${clienteId}`);
+}

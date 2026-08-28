@@ -26,6 +26,8 @@ export type ContratoSetorValor =
 export type Financeiro = Database["public"]["Tables"]["financeiro"]["Row"];
 export type FinanceiroItem =
   Database["public"]["Tables"]["financeiro_itens"]["Row"];
+export type ClienteAnexo =
+  Database["public"]["Tables"]["cliente_anexos"]["Row"];
 
 export type {
   PerfilUsuario,

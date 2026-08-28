@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Link from "next/link";
 import { Plus, Pencil, Trash2, Download, Upload } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -106,7 +107,11 @@ export function ClientesPainel({ clientes }: ClientesPainelProps) {
           <tbody>
             {clientes.map((c) => (
               <tr key={c.id} className="border-b border-neutro-2 last:border-0">
-                <td className="px-4 py-3 font-medium text-preto">{c.nome}</td>
+                <td className="px-4 py-3 font-medium text-preto">
+                  <Link href={`/gestao/clientes/${c.id}`} className="hover:text-laranja">
+                    {c.nome}
+                  </Link>
+                </td>
                 <td className="px-4 py-3 text-neutro-1">{c.empresa ?? "-"}</td>
                 <td className="px-4 py-3 text-neutro-1">
                   {c.contato_nome ?? "-"}

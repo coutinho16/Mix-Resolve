@@ -433,6 +433,27 @@ export interface Database {
         >;
         Relationships: [];
       };
+      cliente_anexos: {
+        Row: {
+          id: string;
+          cliente_id: string;
+          nome_arquivo: string;
+          caminho_storage: string;
+          tipo_conteudo: string | null;
+          tamanho_bytes: number | null;
+          created_by: string | null;
+          created_at: string;
+        };
+        Insert: Partial<
+          Database["public"]["Tables"]["cliente_anexos"]["Row"]
+        > & {
+          cliente_id: string;
+          nome_arquivo: string;
+          caminho_storage: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["cliente_anexos"]["Row"]>;
+        Relationships: [];
+      };
     };
     Views: {
       v_reservas_diarias: {
