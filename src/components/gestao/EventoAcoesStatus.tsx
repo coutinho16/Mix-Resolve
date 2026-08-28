@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { Download } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Chip } from "@/components/ui/Chip";
 import type { StatusEvento } from "@/types/domain";
@@ -48,6 +49,12 @@ export function EventoAcoesStatus({
           Cancelar evento
         </Button>
       )}
+      <a href={`/api/pdf/evento/${eventoId}`} target="_blank" rel="noreferrer">
+        <Button type="button" variant="secondary">
+          <Download size={16} />
+          Ficha em PDF
+        </Button>
+      </a>
     </div>
   );
 }
