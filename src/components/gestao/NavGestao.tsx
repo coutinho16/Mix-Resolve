@@ -14,6 +14,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { sair } from "@/lib/auth/actions";
+import { ThemeToggle } from "@/components/shared/ThemeToggle";
 
 interface NavGestaoProps {
   nome: string;
@@ -35,13 +36,16 @@ export function NavGestao({ nome, admin }: NavGestaoProps) {
 
   return (
     <nav className="flex h-full w-60 shrink-0 flex-col border-r border-neutro-2 bg-branco-puro px-3 py-4">
-      <div className="mb-6 px-2">
-        <span className="font-titulo text-lg font-bold lowercase text-laranja">
-          mix.
-        </span>
-        <div className="text-[10px] font-semibold tracking-[0.2em] text-preto">
-          RESOLVE
+      <div className="mb-6 flex items-start justify-between px-2">
+        <div>
+          <span className="font-titulo text-lg font-bold lowercase text-laranja">
+            mix.
+          </span>
+          <div className="text-[10px] font-semibold tracking-[0.2em] text-preto">
+            RESOLVE
+          </div>
         </div>
+        <ThemeToggle />
       </div>
 
       <div className="flex flex-1 flex-col gap-1 overflow-y-auto">

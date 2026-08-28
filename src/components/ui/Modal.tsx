@@ -41,7 +41,7 @@ export function Modal({ aberto, titulo, onFechar, children }: ModalProps) {
   // validação/submit quando o modal contém seu próprio <form>).
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-preto/40 px-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
       onClick={(e) => {
         if (e.target === e.currentTarget) onFechar();
       }}

@@ -21,6 +21,22 @@
   --font-texto: var(--font-inter);
 }
 
+:root.dark {
+  color-scheme: dark;
+  --color-laranja: #ff6a35;
+  --color-preto: #f2efe9;
+  --color-branco: #17140f;
+  --color-branco-puro: #201d17;
+  --color-neutro-1: #a49e90;
+  --color-neutro-2: #34302a;
+  --color-neutro-3: #221f19;
+
+  --color-estado-disponivel: #3dbb73;
+  --color-estado-em-uso: #ff6a35;
+  --color-estado-manutencao: #a49e90;
+  --color-estado-conflito: #e3625f;
+}
+
 @theme inline {
   --color-laranja: var(--color-laranja);
   --color-preto: var(--color-preto);

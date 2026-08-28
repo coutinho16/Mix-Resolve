@@ -20,12 +20,26 @@ export const metadata: Metadata = {
   description: "Sistema de gestão da Mix Resolve",
 };
 
+const TEMA_SCRIPT = `
+(function () {
+  try {
+    var tema = localStorage.getItem("tema");
+    if (tema === "dark") {
+      document.documentElement.classList.add("dark");
+    }
+  } catch (e) {}
+})();
+`;
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="pt-BR"
       className={`${poppins.variable} ${inter.variable} h-full antialiased`}
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: TEMA_SCRIPT }} />
+      </head>
       <body className="min-h-full flex flex-col bg-branco text-preto">
         <FaixaDemo />
         {children}
