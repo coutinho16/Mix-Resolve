@@ -14,9 +14,9 @@ export default async function GestaoLayout({
   }
 
   return (
-    <div className="flex min-h-screen bg-neutro-3">
+    <div className="flex h-screen overflow-hidden bg-neutro-3">
       <NavGestao nome={usuario.nome} admin={isAdminGestao(usuario)} />
-      <main className="flex-1 overflow-x-auto p-6 sm:p-8">{children}</main>
+      <main className="flex-1 overflow-y-auto overflow-x-auto p-6 sm:p-8">{children}</main>
     </div>
   );
 }

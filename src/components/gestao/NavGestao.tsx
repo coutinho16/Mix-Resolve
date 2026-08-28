@@ -44,7 +44,7 @@ export function NavGestao({ nome, admin }: NavGestaoProps) {
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col gap-1">
+      <div className="flex flex-1 flex-col gap-1 overflow-y-auto">
         {itens.map(({ href, label, icon: Icon }) => {
           const ativo = pathname.startsWith(href);
           return (
