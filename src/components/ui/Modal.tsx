@@ -48,9 +48,9 @@ export function Modal({ aberto, titulo, onFechar, children }: ModalProps) {
     >
       <div
         ref={ref}
-        className="w-full max-w-lg rounded-xl bg-branco-puro p-6 shadow-lg"
+        className="flex max-h-[85vh] w-full max-w-lg flex-col rounded-xl bg-branco-puro shadow-lg"
       >
-        <div className="mb-4 flex items-center justify-between">
+        <div className="flex shrink-0 items-center justify-between p-6 pb-4">
           <h2 className="font-titulo text-lg font-semibold text-preto">
             {titulo}
           </h2>
@@ -62,7 +62,7 @@ export function Modal({ aberto, titulo, onFechar, children }: ModalProps) {
             <X size={18} />
           </button>
         </div>
-        {children}
+        <div className="overflow-y-auto px-6 pb-6">{children}</div>
       </div>
     </div>,
     document.body
