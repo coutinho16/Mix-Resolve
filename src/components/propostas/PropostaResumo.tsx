@@ -3,25 +3,32 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { agruparPorSetor, type ItemComSetor } from "@/lib/pdf/agrupamento";
 import { PropostaAcoes } from "@/components/propostas/PropostaAcoes";
-import type { StatusProposta } from "@/types/domain";
+import { GerarFinanceiroModal } from "@/components/financeiro/GerarFinanceiroModal";
+import type { Cliente, StatusProposta } from "@/types/domain";
 
 const fmt = (v: number) =>
   v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 interface PropostaResumoProps {
   propostaId: string;
+  numeroCliente: number | null;
   status: StatusProposta;
   contratoId: string | null;
   itens: ItemComSetor[];
   valorTotal: number;
+  clientes: Cliente[];
+  cliente: Cliente | null;
 }
 
 export function PropostaResumo({
   propostaId,
+  numeroCliente,
   status,
   contratoId,
   itens,
   valorTotal,
+  clientes,
+  cliente,
 }: PropostaResumoProps) {
   const grupos = agruparPorSetor(itens);
   const totalItens = itens.reduce((acc, i) => acc + i.quantidade, 0);
@@ -79,6 +86,29 @@ export function PropostaResumo({
           Baixar proposta em PDF
         </Button>
       </a>
+
+      <GerarFinanceiroModal
+        clientes={clientes}
+        dadosPuxados={{
+          tipo: "fatura",
+          cliente_id: cliente?.id ?? "",
+          cliente_nome: cliente ? cliente.empresa || cliente.nome : "",
+          cliente_documento: cliente?.documento ?? "",
+          cliente_endereco: cliente?.endereco ?? "",
+          cliente_telefone: cliente?.telefone ?? "",
+          cliente_email: cliente?.email ?? "",
+          proposta_id: propostaId,
+          contrato_id: "",
+          descricao: `Referente à proposta${numeroCliente ? ` nº ${numeroCliente}` : ""}`,
+          valor_total: valorTotal,
+        }}
+        itensPuxados={itens.map((i) => ({
+          descricao: i.descricao,
+          quantidade: i.quantidade,
+          valor_unitario: i.valor_unitario,
+          valor_total: i.valor_total,
+        }))}
+      />
 
       <div className="border-t border-neutro-2 pt-4">
         <PropostaAcoes propostaId={propostaId} status={status} contratoId={contratoId} />

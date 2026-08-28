@@ -1,14 +1,14 @@
 "use client";
 
 import { useTransition } from "react";
-import Link from "next/link";
-import { Download, Receipt } from "lucide-react";
+import { Download } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Chip } from "@/components/ui/Chip";
 import { agruparPorSetor, type ItemComSetor } from "@/lib/pdf/agrupamento";
 import { atualizarStatusContrato } from "@/app/gestao/contratos/actions";
-import type { StatusContrato } from "@/types/domain";
+import { GerarFinanceiroModal } from "@/components/financeiro/GerarFinanceiroModal";
+import type { Cliente, Contrato, StatusContrato } from "@/types/domain";
 
 const fmt = (v: number) =>
   v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -20,14 +20,16 @@ const rotulo: Record<StatusContrato, string> = {
 };
 
 interface ContratoResumoProps {
-  contratoId: string;
-  status: StatusContrato;
+  contrato: Contrato;
+  clientes: Cliente[];
   itens: ItemComSetor[];
   valorTotal: number;
   ehPermuta: boolean;
 }
 
-export function ContratoResumo({ contratoId, status, itens, valorTotal, ehPermuta }: ContratoResumoProps) {
+export function ContratoResumo({ contrato, clientes, itens, valorTotal, ehPermuta }: ContratoResumoProps) {
+  const contratoId = contrato.id;
+  const status = contrato.status;
   const [pending, startTransition] = useTransition();
   const grupos = agruparPorSetor(itens);
   const totalItens = itens.reduce((acc, i) => acc + i.quantidade, 0);
@@ -79,12 +81,26 @@ export function ContratoResumo({ contratoId, status, itens, valorTotal, ehPermut
         </Button>
       </a>
 
-      <Link href={`/gestao/financeiro/novo?contratoId=${contratoId}`}>
-        <Button type="button" variant="secondary" className="w-full">
-          <Receipt size={16} />
-          Gerar fatura ou recibo
-        </Button>
-      </Link>
+      <GerarFinanceiroModal
+        clientes={clientes}
+        dadosPuxados={{
+          tipo: "fatura",
+          cliente_id: contrato.cliente_id ?? "",
+          cliente_nome: contrato.contratante_nome,
+          cliente_documento: contrato.contratante_documento ?? "",
+          cliente_endereco: contrato.contratante_endereco ?? "",
+          proposta_id: "",
+          contrato_id: contratoId,
+          descricao: `Referente ao contrato${contrato.numero_cliente ? ` nº ${contrato.numero_cliente}` : ""}`,
+          valor_total: ehPermuta ? contrato.permuta_valor ?? 0 : valorTotal,
+        }}
+        itensPuxados={itens.map((i) => ({
+          descricao: i.descricao,
+          quantidade: i.quantidade,
+          valor_unitario: i.valor_unitario,
+          valor_total: i.valor_total,
+        }))}
+      />
 
       <div className="flex flex-wrap items-center gap-2 border-t border-neutro-2 pt-4">
         <Chip estado={status === "assinado" ? "disponivel" : "em-uso"} texto={rotulo[status]} />

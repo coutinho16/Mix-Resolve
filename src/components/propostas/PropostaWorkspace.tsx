@@ -510,10 +510,13 @@ export function PropostaWorkspace({
 
         <PropostaResumo
           propostaId={proposta.id}
+          numeroCliente={proposta.numero_cliente}
           status={proposta.status}
           contratoId={contrato?.id ?? null}
           itens={itensComSetor}
           valorTotal={proposta.valor_total}
+          clientes={clientes}
+          cliente={clientes.find((c) => c.id === proposta.cliente_id) ?? null}
         />
       </div>
     </div>

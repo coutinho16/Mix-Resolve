@@ -510,8 +510,8 @@ export function ContratoWorkspace({
         </Card>
 
         <ContratoResumo
-          contratoId={contrato.id}
-          status={contrato.status}
+          contrato={contrato}
+          clientes={clientes}
           itens={itensComSetor}
           valorTotal={ehPermuta ? contrato.permuta_valor ?? 0 : contrato.valor_total}
           ehPermuta={ehPermuta}

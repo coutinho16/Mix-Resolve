@@ -6,18 +6,21 @@ import { NovoClienteModal } from "@/components/clientes/NovoClienteModal";
 import type { Cliente } from "@/types/domain";
 import type { FinanceiroActionState } from "@/app/gestao/financeiro/actions";
 
-interface ItemPuxado {
+export interface ItemPuxado {
   descricao: string;
   quantidade: number;
   valor_unitario: number;
   valor_total: number;
 }
 
-interface DadosPuxados {
+export interface DadosPuxados {
   tipo: "fatura" | "recibo";
   cliente_id: string;
   cliente_nome: string;
   cliente_documento: string;
+  cliente_endereco?: string;
+  cliente_telefone?: string;
+  cliente_email?: string;
   proposta_id: string;
   contrato_id: string;
   descricao: string;
@@ -45,7 +48,9 @@ export function FinanceiroForm({
   const [clienteId, setClienteId] = useState(dadosPuxados?.cliente_id ?? "");
   const [clienteNome, setClienteNome] = useState(dadosPuxados?.cliente_nome ?? "");
   const [clienteDocumento, setClienteDocumento] = useState(dadosPuxados?.cliente_documento ?? "");
-  const [clienteEndereco, setClienteEndereco] = useState("");
+  const [clienteEndereco, setClienteEndereco] = useState(dadosPuxados?.cliente_endereco ?? "");
+  const [clienteTelefone, setClienteTelefone] = useState(dadosPuxados?.cliente_telefone ?? "");
+  const [clienteEmail, setClienteEmail] = useState(dadosPuxados?.cliente_email ?? "");
   const ehFatura = tipo === "fatura";
 
   return (
@@ -111,6 +116,8 @@ export function FinanceiroForm({
               setClienteNome(cliente.empresa || cliente.nome);
               setClienteDocumento(cliente.documento ?? "");
               setClienteEndereco(cliente.endereco ?? "");
+              setClienteTelefone(cliente.telefone ?? "");
+              setClienteEmail(cliente.email ?? "");
             }}
           />
         </div>
@@ -164,6 +171,8 @@ export function FinanceiroForm({
           <input
             id="cliente_telefone"
             name="cliente_telefone"
+            value={clienteTelefone}
+            onChange={(e) => setClienteTelefone(e.target.value)}
             className="rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
           />
         </div>
@@ -174,6 +183,8 @@ export function FinanceiroForm({
           <input
             id="cliente_email"
             name="cliente_email"
+            value={clienteEmail}
+            onChange={(e) => setClienteEmail(e.target.value)}
             className="rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
           />
         </div>
