@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { FinanceiroForm } from "@/components/financeiro/FinanceiroForm";
 import { criarFinanceiro } from "@/app/gestao/financeiro/actions";
+import { formatarNumeroDocumento } from "@/lib/numeracao";
 import type { Cliente } from "@/types/domain";
 
 export default async function NovoFinanceiroPage({
@@ -33,9 +34,12 @@ export default async function NovoFinanceiroPage({
         cliente_id: proposta.cliente_id ?? "",
         cliente_nome: cliente?.empresa || cliente?.nome || "",
         cliente_documento: cliente?.documento ?? "",
+        cliente_endereco: cliente?.endereco ?? "",
+        cliente_telefone: cliente?.telefone ?? "",
+        cliente_email: cliente?.email ?? "",
         proposta_id: proposta.id,
         contrato_id: "",
-        descricao: `Referente à proposta nº ${proposta.numero_cliente ?? ""}`.trim(),
+        descricao: `Referente à proposta ${formatarNumeroDocumento(cliente?.numero, "P", proposta.numero_cliente)}`,
         valor_total: proposta.valor_total,
       };
       const { data: itens } = await supabase
@@ -59,9 +63,12 @@ export default async function NovoFinanceiroPage({
         cliente_id: contrato.cliente_id ?? "",
         cliente_nome: cliente?.empresa || cliente?.nome || contrato.contratante_nome || "",
         cliente_documento: cliente?.documento || contrato.contratante_documento || "",
+        cliente_endereco: cliente?.endereco || contrato.contratante_endereco || "",
+        cliente_telefone: cliente?.telefone ?? "",
+        cliente_email: cliente?.email ?? "",
         proposta_id: "",
         contrato_id: contrato.id,
-        descricao: `Referente ao contrato nº ${contrato.numero_cliente ?? ""}`.trim(),
+        descricao: `Referente ao contrato ${formatarNumeroDocumento(cliente?.numero, "C", contrato.numero_cliente)}`,
         valor_total: contrato.valor_total,
       };
       const { data: itens } = await supabase
@@ -109,12 +116,14 @@ export default async function NovoFinanceiroPage({
                 className="flex-1 rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
               >
                 <option value="">Nenhuma proposta selecionada</option>
-                {(propostas ?? []).map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {(p as unknown as { clientes?: { nome: string } }).clientes?.nome ?? "Proposta"}
-                    {p.numero_cliente ? ` · nº ${p.numero_cliente}` : ""}
-                  </option>
-                ))}
+                {(propostas ?? []).map((p) => {
+                  const cliente = (p as unknown as { clientes?: { nome: string; numero: number } }).clientes;
+                  return (
+                    <option key={p.id} value={p.id}>
+                      {cliente?.nome ?? "Proposta"} · {formatarNumeroDocumento(cliente?.numero, "P", p.numero_cliente)}
+                    </option>
+                  );
+                })}
               </select>
               <Button type="submit" variant="secondary">
                 Puxar da proposta
@@ -127,12 +136,15 @@ export default async function NovoFinanceiroPage({
                 className="flex-1 rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
               >
                 <option value="">Nenhum contrato selecionado</option>
-                {(contratos ?? []).map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.contratante_nome || "Contrato"}
-                    {c.numero_cliente ? ` · nº ${c.numero_cliente}` : ""}
-                  </option>
-                ))}
+                {(contratos ?? []).map((c) => {
+                  const cliente = (c as unknown as { clientes?: { numero: number } }).clientes;
+                  return (
+                    <option key={c.id} value={c.id}>
+                      {c.contratante_nome || "Contrato"} ·{" "}
+                      {formatarNumeroDocumento(cliente?.numero, "C", c.numero_cliente)}
+                    </option>
+                  );
+                })}
               </select>
               <Button type="submit" variant="secondary">
                 Puxar do contrato

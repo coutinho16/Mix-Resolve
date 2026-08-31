@@ -3,6 +3,7 @@ import { assetSeExistir } from "@/lib/pdf/assets";
 import { agruparPorSetor, type ItemComSetor } from "@/lib/pdf/agrupamento";
 import { valorPorExtenso } from "@/lib/pdf/extenso";
 import { MIX_DADOS } from "@/lib/contratos/textosPadrao";
+import { formatarNumeroDocumento } from "@/lib/numeracao";
 import type { Assinante, Contrato } from "@/types/domain";
 
 const ORANGE = "#F85818";
@@ -152,9 +153,15 @@ interface ContratoDocumentProps {
   contrato: Contrato;
   itens: ItemComSetor[];
   propostaNumeroCliente: number | null;
+  clienteNumero: number | null;
 }
 
-export function ContratoDocument({ contrato, itens, propostaNumeroCliente }: ContratoDocumentProps) {
+export function ContratoDocument({
+  contrato,
+  itens,
+  propostaNumeroCliente,
+  clienteNumero,
+}: ContratoDocumentProps) {
   const logo = assetSeExistir("logo.png");
   const assinaturaContratada = assetSeExistir(`assinatura-${contrato.signatario}.png`);
   const grupos = agruparPorSetor(itens);
@@ -183,9 +190,10 @@ export function ContratoDocument({ contrato, itens, propostaNumeroCliente }: Con
         <Text style={styles.titulo}>CONTRATO DE PRESTAÇÃO DE SERVIÇOS</Text>
         <View style={styles.tituloBarra} />
         <Text style={styles.numero}>
-          {contrato.numero_cliente ? `Contrato nº ${contrato.numero_cliente}` : ""}
-          {contrato.numero_cliente && propostaNumeroCliente ? " · " : ""}
-          {propostaNumeroCliente ? `referente à Proposta nº ${propostaNumeroCliente}` : ""}
+          {`Contrato ${formatarNumeroDocumento(clienteNumero, "C", contrato.numero_cliente)}`}
+          {propostaNumeroCliente
+            ? ` · referente à Proposta ${formatarNumeroDocumento(clienteNumero, "P", propostaNumeroCliente)}`
+            : ""}
         </Text>
 
         <Text style={styles.paragrafo}>

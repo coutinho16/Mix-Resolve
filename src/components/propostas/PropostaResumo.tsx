@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/Button";
 import { agruparPorSetor, type ItemComSetor } from "@/lib/pdf/agrupamento";
 import { PropostaAcoes } from "@/components/propostas/PropostaAcoes";
 import { GerarFinanceiroModal } from "@/components/financeiro/GerarFinanceiroModal";
+import { formatarNumeroDocumento } from "@/lib/numeracao";
 import type { Cliente, StatusProposta } from "@/types/domain";
 
 const fmt = (v: number) =>
@@ -99,7 +100,7 @@ export function PropostaResumo({
           cliente_email: cliente?.email ?? "",
           proposta_id: propostaId,
           contrato_id: "",
-          descricao: `Referente à proposta${numeroCliente ? ` nº ${numeroCliente}` : ""}`,
+          descricao: `Referente à proposta ${formatarNumeroDocumento(cliente?.numero, "P", numeroCliente)}`,
           valor_total: valorTotal,
         }}
         itensPuxados={itens.map((i) => ({

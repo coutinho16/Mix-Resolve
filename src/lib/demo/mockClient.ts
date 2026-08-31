@@ -40,11 +40,20 @@ function proximoNumeroControle(linhas: Record<string, unknown>[]): number {
   return maior + 1;
 }
 
+function proximoNumero(linhas: Record<string, unknown>[]): number {
+  const maior = linhas.reduce((max, l) => Math.max(max, Number(l.numero ?? 0)), 0);
+  return maior + 1;
+}
+
 function defaultsFor(table: string): Record<string, unknown> {
   const agora = new Date().toISOString();
   switch (table) {
     case "clientes":
-      return { created_at: agora, updated_at: agora };
+      return {
+        numero: proximoNumero(store.clientes as unknown as Record<string, unknown>[]),
+        created_at: agora,
+        updated_at: agora,
+      };
     case "categorias_equipamento":
       return { ordem: 0 };
     case "equipamentos":

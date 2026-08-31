@@ -18,13 +18,16 @@ export async function GET(
     return new Response("Contrato não encontrado.", { status: 404 });
   }
 
-  const [{ data: itens }, { data: equipamentos }, { data: categorias }, { data: proposta }] =
+  const [{ data: itens }, { data: equipamentos }, { data: categorias }, { data: proposta }, { data: cliente }] =
     await Promise.all([
       supabase.from("contrato_itens").select("*").eq("contrato_id", id).order("ordem"),
       supabase.from("equipamentos").select("*"),
       supabase.from("categorias_equipamento").select("*"),
       contrato.proposta_id
         ? supabase.from("propostas").select("numero_cliente").eq("id", contrato.proposta_id).maybeSingle()
+        : Promise.resolve({ data: null }),
+      contrato.cliente_id
+        ? supabase.from("clientes").select("numero").eq("id", contrato.cliente_id).maybeSingle()
         : Promise.resolve({ data: null }),
     ]);
 
@@ -35,6 +38,7 @@ export async function GET(
       contrato,
       itens: itensComSetor,
       propostaNumeroCliente: proposta?.numero_cliente ?? null,
+      clienteNumero: cliente?.numero ?? null,
     })
   );
 

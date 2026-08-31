@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Modal } from "@/components/ui/Modal";
 import { ClienteForm } from "@/components/gestao/ClienteForm";
+import { formatarNumeroCliente } from "@/lib/numeracao";
 import type { Cliente } from "@/types/domain";
 import {
   criarCliente,
@@ -97,6 +98,7 @@ export function ClientesPainel({ clientes }: ClientesPainelProps) {
         <table className="w-full min-w-[720px] text-left text-sm">
           <thead className="border-b border-neutro-2 text-neutro-1">
             <tr>
+              <th className="px-4 py-3 font-medium">Nº</th>
               <th className="px-4 py-3 font-medium">Nome</th>
               <th className="px-4 py-3 font-medium">Empresa</th>
               <th className="px-4 py-3 font-medium">Contato</th>
@@ -107,6 +109,7 @@ export function ClientesPainel({ clientes }: ClientesPainelProps) {
           <tbody>
             {clientes.map((c) => (
               <tr key={c.id} className="border-b border-neutro-2 last:border-0">
+                <td className="px-4 py-3 text-neutro-1">{formatarNumeroCliente(c.numero)}</td>
                 <td className="px-4 py-3 font-medium text-preto">
                   <Link href={`/gestao/clientes/${c.id}`} className="hover:text-laranja">
                     {c.nome}
@@ -139,7 +142,7 @@ export function ClientesPainel({ clientes }: ClientesPainelProps) {
             ))}
             {clientes.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-neutro-1">
+                <td colSpan={6} className="px-4 py-8 text-center text-neutro-1">
                   Nenhum cliente cadastrado ainda.
                 </td>
               </tr>

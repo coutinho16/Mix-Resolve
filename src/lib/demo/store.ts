@@ -79,6 +79,7 @@ const CLI_3 = id();
 export const clientes: Cliente[] = [
   {
     id: CLI_1,
+    numero: 1,
     nome: "Camila Rocha",
     empresa: "Camila Rocha Eventos",
     documento: "12.345.678/0001-90",
@@ -92,6 +93,7 @@ export const clientes: Cliente[] = [
   },
   {
     id: CLI_2,
+    numero: 2,
     nome: "Marcos Diniz",
     empresa: "Grupo Diniz Corporativo",
     documento: "98.765.432/0001-10",
@@ -105,6 +107,7 @@ export const clientes: Cliente[] = [
   },
   {
     id: CLI_3,
+    numero: 3,
     nome: "Fernanda Lima",
     empresa: null,
     documento: "123.456.789-00",

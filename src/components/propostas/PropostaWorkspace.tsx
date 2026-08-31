@@ -10,6 +10,7 @@ import { AssinaturaPreview } from "@/components/propostas/AssinaturaPreview";
 import { PropostaItensEditor } from "@/components/propostas/PropostaItensEditor";
 import { PropostaResumo } from "@/components/propostas/PropostaResumo";
 import { resolverSetorDosItens, agruparPorSetor } from "@/lib/pdf/agrupamento";
+import { formatarNumeroDocumento } from "@/lib/numeracao";
 import { atualizarProposta } from "@/app/gestao/propostas/actions";
 import type {
   Assinante,
@@ -79,11 +80,15 @@ export function PropostaWorkspace({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="font-titulo text-2xl font-semibold text-preto">
-            Proposta {proposta.numero_cliente ? `nº ${proposta.numero_cliente}` : ""}
+            Proposta{" "}
+            {formatarNumeroDocumento(
+              clientes.find((c) => c.id === proposta.cliente_id)?.numero,
+              "P",
+              proposta.numero_cliente
+            )}
           </h1>
           <p className="text-sm text-neutro-1">
             {clientes.find((c) => c.id === proposta.cliente_id)?.nome ?? "Sem cliente"}
-            <span className="text-neutro-1/70"> · controle #{proposta.numero_controle}</span>
           </p>
         </div>
         <Link href="/gestao/clientes">

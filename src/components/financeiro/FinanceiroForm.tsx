@@ -226,28 +226,16 @@ export function FinanceiroForm({
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="numero" className="text-sm font-medium text-preto">
-            Número (opcional)
-          </label>
-          <input
-            id="numero"
-            name="numero"
-            className="rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
-          />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="data_emissao" className="text-sm font-medium text-preto">
-            Data de emissão
-          </label>
-          <input
-            id="data_emissao"
-            name="data_emissao"
-            type="date"
-            className="rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
-          />
-        </div>
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="data_emissao" className="text-sm font-medium text-preto">
+          Data de emissão
+        </label>
+        <input
+          id="data_emissao"
+          name="data_emissao"
+          type="date"
+          className="w-full max-w-[220px] rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
+        />
       </div>
 
       {ehFatura && (

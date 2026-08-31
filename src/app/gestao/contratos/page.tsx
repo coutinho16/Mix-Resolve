@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Chip } from "@/components/ui/Chip";
+import { formatarNumeroDocumento } from "@/lib/numeracao";
 import type { StatusContrato } from "@/types/domain";
 
 const rotulo: Record<StatusContrato, string> = {
@@ -16,7 +17,7 @@ export default async function ContratosPage() {
   const supabase = await createClient();
   const { data: contratos } = await supabase
     .from("contratos")
-    .select("*")
+    .select("*, clientes(numero)")
     .order("gerado_em", { ascending: false });
 
   return (
@@ -35,31 +36,36 @@ export default async function ContratosPage() {
         <table className="w-full min-w-[640px] text-left text-sm">
           <thead className="border-b border-neutro-2 text-neutro-1">
             <tr>
+              <th className="px-4 py-3 font-medium">Número</th>
               <th className="px-4 py-3 font-medium">Contratante</th>
               <th className="px-4 py-3 font-medium">Valor</th>
               <th className="px-4 py-3 font-medium">Status</th>
             </tr>
           </thead>
           <tbody>
-            {(contratos ?? []).map((c) => (
-              <tr key={c.id} className="border-b border-neutro-2 last:border-0">
-                <td className="px-4 py-3">
-                  <Link
-                    href={`/gestao/contratos/${c.id}`}
-                    className="font-medium text-preto hover:text-laranja"
-                  >
-                    {c.contratante_nome || "-"}
-                  </Link>
-                </td>
-                <td className="px-4 py-3 text-neutro-1">R$ {c.valor_total.toFixed(2)}</td>
-                <td className="px-4 py-3">
-                  <Chip estado={c.status === "assinado" ? "disponivel" : "em-uso"} texto={rotulo[c.status]} />
-                </td>
-              </tr>
-            ))}
+            {(contratos ?? []).map((c) => {
+              const cliente = (c as unknown as { clientes?: { numero: number } }).clientes;
+              return (
+                <tr key={c.id} className="border-b border-neutro-2 last:border-0">
+                  <td className="px-4 py-3">
+                    <Link
+                      href={`/gestao/contratos/${c.id}`}
+                      className="font-medium text-preto hover:text-laranja"
+                    >
+                      {formatarNumeroDocumento(cliente?.numero, "C", c.numero_cliente)}
+                    </Link>
+                  </td>
+                  <td className="px-4 py-3 text-neutro-1">{c.contratante_nome || "-"}</td>
+                  <td className="px-4 py-3 text-neutro-1">R$ {c.valor_total.toFixed(2)}</td>
+                  <td className="px-4 py-3">
+                    <Chip estado={c.status === "assinado" ? "disponivel" : "em-uso"} texto={rotulo[c.status]} />
+                  </td>
+                </tr>
+              );
+            })}
             {(!contratos || contratos.length === 0) && (
               <tr>
-                <td colSpan={3} className="px-4 py-8 text-center text-neutro-1">
+                <td colSpan={4} className="px-4 py-8 text-center text-neutro-1">
                   Nenhum contrato cadastrado ainda.
                 </td>
               </tr>

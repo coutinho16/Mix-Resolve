@@ -3,6 +3,7 @@ import { assetSeExistir } from "@/lib/pdf/assets";
 import { agruparPorSetor, type ItemComSetor } from "@/lib/pdf/agrupamento";
 import { valorPorExtenso } from "@/lib/pdf/extenso";
 import { TEXTO_ABERTURA_PADRAO, DIFERENCIAIS_PADRAO, MIX_DADOS } from "@/lib/contratos/textosPadrao";
+import { formatarNumeroDocumento } from "@/lib/numeracao";
 import type { Assinante, Cliente, DescontoTipo, Proposta } from "@/types/domain";
 
 const ORANGE = "#F85818";
@@ -215,9 +216,9 @@ export function PropostaDocument({ proposta, cliente, itens }: PropostaDocumentP
             <Text style={styles.metaTexto}>
               Natal, {new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}
             </Text>
-            {proposta.numero_cliente && (
-              <Text style={styles.metaTexto}>Proposta nº {proposta.numero_cliente}</Text>
-            )}
+            <Text style={styles.metaTexto}>
+              Proposta {formatarNumeroDocumento(cliente.numero, "P", proposta.numero_cliente)}
+            </Text>
             {validadeFmt && <Text style={styles.metaTexto}>Válida até {validadeFmt}</Text>}
           </View>
         </View>

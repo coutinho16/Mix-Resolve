@@ -63,6 +63,17 @@ function extrairItensPuxados(formData: FormData): ItemPuxado[] {
   }
 }
 
+async function proximoNumeroClienteFinanceiro(clienteId: string, tipo: "fatura" | "recibo") {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("financeiro")
+    .select("numero_cliente")
+    .eq("cliente_id", clienteId)
+    .eq("tipo", tipo);
+  const maior = (data ?? []).reduce((max, r) => Math.max(max, r.numero_cliente ?? 0), 0);
+  return maior + 1;
+}
+
 export async function criarFinanceiro(
   _prev: FinanceiroActionState,
   formData: FormData
@@ -81,9 +92,13 @@ export async function criarFinanceiro(
   if (!dados.contrato_id) delete dados.contrato_id;
   if (!dados.signatario) delete dados.signatario;
 
+  const numero_cliente = dados.cliente_id
+    ? await proximoNumeroClienteFinanceiro(dados.cliente_id as string, parsed.data.tipo)
+    : null;
+
   const { data, error } = await supabase
     .from("financeiro")
-    .insert({ ...dados, created_by: usuario?.id ?? null } as never)
+    .insert({ ...dados, numero_cliente, created_by: usuario?.id ?? null } as never)
     .select("id")
     .single();
 

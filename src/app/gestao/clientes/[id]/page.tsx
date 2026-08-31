@@ -8,6 +8,7 @@ import { ClienteAnexos } from "@/components/gestao/ClienteAnexos";
 import { excluirProposta } from "@/app/gestao/propostas/actions";
 import { excluirContrato } from "@/app/gestao/contratos/actions";
 import { excluirFinanceiro } from "@/app/gestao/financeiro/actions";
+import { formatarNumeroCliente, formatarNumeroDocumento } from "@/lib/numeracao";
 import type {
   StatusContrato,
   StatusFinanceiro,
@@ -71,7 +72,12 @@ export default async function ClienteDetalhePage({
         <Link href="/gestao/clientes" className="text-sm text-neutro-1 hover:text-laranja">
           ← Clientes
         </Link>
-        <h1 className="mt-1 font-titulo text-2xl font-semibold text-preto">{cliente.nome}</h1>
+        <h1 className="mt-1 font-titulo text-2xl font-semibold text-preto">
+          {cliente.nome}
+          <span className="ml-2 text-base font-normal text-neutro-1">
+            nº {formatarNumeroCliente(cliente.numero)}
+          </span>
+        </h1>
         <p className="text-sm text-neutro-1">
           {[cliente.empresa, cliente.documento].filter(Boolean).join(" · ") || "Sem dados adicionais"}
         </p>
@@ -114,7 +120,7 @@ export default async function ClienteDetalhePage({
                 className="flex flex-1 items-center justify-between rounded-lg border border-neutro-2 px-3 py-2 text-sm hover:bg-neutro-3"
               >
                 <span className="text-preto">
-                  Proposta {p.numero_cliente ? `nº ${p.numero_cliente}` : ""}
+                  Proposta {formatarNumeroDocumento(cliente.numero, "P", p.numero_cliente)}
                   <span className="ml-2 text-neutro-1">R$ {p.valor_total.toFixed(2)}</span>
                 </span>
                 <Chip estado={p.status === "aceita" ? "disponivel" : "em-uso"} texto={rotuloProposta[p.status]} />
@@ -141,7 +147,7 @@ export default async function ClienteDetalhePage({
                 className="flex flex-1 items-center justify-between rounded-lg border border-neutro-2 px-3 py-2 text-sm hover:bg-neutro-3"
               >
                 <span className="text-preto">
-                  Contrato {c.numero_cliente ? `nº ${c.numero_cliente}` : ""}
+                  Contrato {formatarNumeroDocumento(cliente.numero, "C", c.numero_cliente)}
                   <span className="ml-2 text-neutro-1">R$ {c.valor_total.toFixed(2)}</span>
                 </span>
                 <Chip estado={c.status === "assinado" ? "disponivel" : "em-uso"} texto={rotuloContrato[c.status]} />
@@ -168,8 +174,8 @@ export default async function ClienteDetalhePage({
                 className="flex flex-1 items-center justify-between rounded-lg border border-neutro-2 px-3 py-2 text-sm hover:bg-neutro-3"
               >
                 <span className="text-preto">
-                  {rotuloTipoFinanceiro[f.tipo]}
-                  {f.numero ? ` nº ${f.numero}` : ""}
+                  {rotuloTipoFinanceiro[f.tipo]}{" "}
+                  {formatarNumeroDocumento(cliente.numero, f.tipo === "fatura" ? "N" : "R", f.numero_cliente)}
                   <span className="ml-2 text-neutro-1">R$ {f.valor_total.toFixed(2)}</span>
                 </span>
                 <Chip estado={f.status === "pago" ? "disponivel" : "em-uso"} texto={rotuloFinanceiro[f.status]} />

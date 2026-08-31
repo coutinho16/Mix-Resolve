@@ -2,6 +2,7 @@ import { Document, Page, Text, View, Image, StyleSheet } from "@react-pdf/render
 import { assetSeExistir } from "@/lib/pdf/assets";
 import { valorPorExtenso } from "@/lib/pdf/extenso";
 import { MIX_DADOS } from "@/lib/contratos/textosPadrao";
+import { formatarNumeroDocumento } from "@/lib/numeracao";
 import type { Assinante, Financeiro, FinanceiroItem } from "@/types/domain";
 
 const ORANGE = "#F85818";
@@ -196,26 +197,54 @@ function InfoLinha({ rotulo, valor }: { rotulo: string; valor: string }) {
 interface FinanceiroDocumentProps {
   financeiro: Financeiro;
   itens: FinanceiroItem[];
+  clienteNumero: number | null;
+  propostaNumeroCliente: number | null;
 }
 
-export function FinanceiroDocument({ financeiro, itens }: FinanceiroDocumentProps) {
+export function FinanceiroDocument({
+  financeiro,
+  itens,
+  clienteNumero,
+  propostaNumeroCliente,
+}: FinanceiroDocumentProps) {
   const logo = assetSeExistir("logo.png");
   const assinatura = financeiro.signatario ? assetSeExistir(`assinatura-${financeiro.signatario}.png`) : null;
+  const numeroFormatado = formatarNumeroDocumento(
+    clienteNumero,
+    financeiro.tipo === "fatura" ? "N" : "R",
+    financeiro.numero_cliente
+  );
 
   if (financeiro.tipo === "fatura") {
-    return <FaturaPdf financeiro={financeiro} itens={itens} logo={logo} />;
+    return (
+      <FaturaPdf
+        financeiro={financeiro}
+        itens={itens}
+        logo={logo}
+        numeroFormatado={numeroFormatado}
+        propostaNumeroFormatado={
+          financeiro.proposta_id ? formatarNumeroDocumento(clienteNumero, "P", propostaNumeroCliente) : null
+        }
+      />
+    );
   }
-  return <ReciboPdf financeiro={financeiro} logo={logo} assinatura={assinatura} />;
+  return (
+    <ReciboPdf financeiro={financeiro} logo={logo} assinatura={assinatura} numeroFormatado={numeroFormatado} />
+  );
 }
 
 function FaturaPdf({
   financeiro,
   itens,
   logo,
+  numeroFormatado,
+  propostaNumeroFormatado,
 }: {
   financeiro: Financeiro;
   itens: FinanceiroItem[];
   logo: string | null;
+  numeroFormatado: string;
+  propostaNumeroFormatado: string | null;
 }) {
   return (
     <Document>
@@ -237,7 +266,7 @@ function FaturaPdf({
             <View style={styles.numLinha}>
               <View style={styles.numCel}>
                 <Text style={styles.numRotulo}>Nº DA NOTA DE FATURA</Text>
-                <Text style={styles.numValor}>{financeiro.numero || `#${financeiro.numero_controle}`}</Text>
+                <Text style={styles.numValor}>{numeroFormatado}</Text>
               </View>
               <View style={styles.numCelUltima}>
                 <Text style={styles.numRotulo}>Nº DA SUBSTITUIÇÃO</Text>
@@ -257,7 +286,7 @@ function FaturaPdf({
             <View style={[styles.numLinha, { borderBottom: "none" }]}>
               <View style={styles.numCel}>
                 <Text style={styles.numRotulo}>Nº DA PROPOSTA</Text>
-                <Text style={styles.numValor}>{financeiro.proposta_id ? "vinculada" : "-"}</Text>
+                <Text style={styles.numValor}>{propostaNumeroFormatado ?? "-"}</Text>
               </View>
               <View style={styles.numCelUltima}>
                 <Text style={styles.numRotulo}>DATA DA ENTREGA</Text>
@@ -428,10 +457,12 @@ function ReciboPdf({
   financeiro,
   logo,
   assinatura,
+  numeroFormatado,
 }: {
   financeiro: Financeiro;
   logo: string | null;
   assinatura: string | null;
+  numeroFormatado: string;
 }) {
   const dataEmissao = fmtData(financeiro.data_emissao);
 
@@ -459,6 +490,9 @@ function ReciboPdf({
 
         <Text style={styles.reciboTitulo}>RECIBO</Text>
         <View style={styles.reciboBarra} />
+        <Text style={[styles.reciboData, { textAlign: "center", marginBottom: 2 }]}>
+          Nº {numeroFormatado}
+        </Text>
         {dataEmissao && <Text style={styles.reciboData}>Natal/RN, {dataEmissao}.</Text>}
 
         <View style={styles.valorBox}>

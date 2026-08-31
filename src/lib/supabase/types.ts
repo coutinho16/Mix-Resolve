@@ -59,6 +59,7 @@ export interface Database {
       clientes: {
         Row: {
           id: string;
+          numero: number;
           nome: string;
           empresa: string | null;
           documento: string | null;
@@ -397,6 +398,7 @@ export interface Database {
           descricao: string | null;
           data_entrega: string | null;
           numero_substituicao: string | null;
+          numero_cliente: number | null;
           valor_total: number;
           forma_pagamento: string | null;
           vencimento: string | null;

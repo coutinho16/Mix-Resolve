@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/Card";
 import { ContratoItensEditor } from "@/components/contratos/ContratoItensEditor";
 import { ContratoResumo } from "@/components/contratos/ContratoResumo";
 import { resolverSetorDosItens, agruparPorSetor } from "@/lib/pdf/agrupamento";
+import { formatarNumeroDocumento } from "@/lib/numeracao";
 import { atualizarContrato } from "@/app/gestao/contratos/actions";
 import type {
   Assinante,
@@ -72,12 +73,14 @@ export function ContratoWorkspace({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="font-titulo text-2xl font-semibold text-preto">
-            Contrato {contrato.numero_cliente ? `nº ${contrato.numero_cliente}` : ""}
+            Contrato{" "}
+            {formatarNumeroDocumento(
+              clientes.find((c) => c.id === contrato.cliente_id)?.numero,
+              "C",
+              contrato.numero_cliente
+            )}
           </h1>
-          <p className="text-sm text-neutro-1">
-            {contrato.contratante_nome}
-            <span className="text-neutro-1/70"> · controle #{contrato.numero_controle}</span>
-          </p>
+          <p className="text-sm text-neutro-1">{contrato.contratante_nome}</p>
         </div>
         <Link href="/gestao/clientes">
           <Button type="button" variant="secondary">

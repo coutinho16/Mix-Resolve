@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/Card";
 import { FinanceiroItensEditor } from "@/components/financeiro/FinanceiroItensEditor";
 import { FinanceiroResumo } from "@/components/financeiro/FinanceiroResumo";
 import { atualizarFinanceiro } from "@/app/gestao/financeiro/actions";
+import { formatarNumeroDocumento } from "@/lib/numeracao";
 import type {
   Assinante,
   Cliente,
@@ -33,19 +34,21 @@ export function FinanceiroWorkspace({ financeiro, clientes, itens }: FinanceiroW
   const [tipo, setTipo] = useState<TipoFinanceiro>(financeiro.tipo);
   const [signatario, setSignatario] = useState<Assinante | "">(financeiro.signatario ?? "");
   const ehFatura = tipo === "fatura";
+  const clienteVinculado = clientes.find((c) => c.id === financeiro.cliente_id) ?? null;
+  const numeroFormatado = formatarNumeroDocumento(
+    clienteVinculado?.numero,
+    ehFatura ? "N" : "R",
+    financeiro.numero_cliente
+  );
 
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="font-titulo text-2xl font-semibold text-preto">
-            {tipo === "fatura" ? "Fatura" : "Recibo"}
-            {financeiro.numero ? ` nº ${financeiro.numero}` : ""}
+            {tipo === "fatura" ? "Fatura" : "Recibo"} {numeroFormatado}
           </h1>
-          <p className="text-sm text-neutro-1">
-            {financeiro.cliente_nome || "Sem cliente definido"}
-            <span className="text-neutro-1/70"> · controle #{financeiro.numero_controle}</span>
-          </p>
+          <p className="text-sm text-neutro-1">{financeiro.cliente_nome || "Sem cliente definido"}</p>
         </div>
         <Link href="/gestao/clientes">
           <Button type="button" variant="secondary">
@@ -197,30 +200,17 @@ export function FinanceiroWorkspace({ financeiro, clientes, itens }: FinanceiroW
               </div>
             )}
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="numero" className="text-sm font-medium text-preto">
-                  Número (opcional)
-                </label>
-                <input
-                  id="numero"
-                  name="numero"
-                  defaultValue={financeiro.numero ?? ""}
-                  className="rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
-                />
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="data_emissao" className="text-sm font-medium text-preto">
-                  Data de emissão
-                </label>
-                <input
-                  id="data_emissao"
-                  name="data_emissao"
-                  type="date"
-                  defaultValue={financeiro.data_emissao ?? ""}
-                  className="rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
-                />
-              </div>
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="data_emissao" className="text-sm font-medium text-preto">
+                Data de emissão
+              </label>
+              <input
+                id="data_emissao"
+                name="data_emissao"
+                type="date"
+                defaultValue={financeiro.data_emissao ?? ""}
+                className="w-full max-w-[220px] rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
+              />
             </div>
 
             {ehFatura && (

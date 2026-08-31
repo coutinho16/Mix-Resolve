@@ -8,6 +8,7 @@ import { Chip } from "@/components/ui/Chip";
 import { agruparPorSetor, type ItemComSetor } from "@/lib/pdf/agrupamento";
 import { atualizarStatusContrato } from "@/app/gestao/contratos/actions";
 import { GerarFinanceiroModal } from "@/components/financeiro/GerarFinanceiroModal";
+import { formatarNumeroDocumento } from "@/lib/numeracao";
 import type { Cliente, Contrato, StatusContrato } from "@/types/domain";
 
 const fmt = (v: number) =>
@@ -30,6 +31,7 @@ interface ContratoResumoProps {
 export function ContratoResumo({ contrato, clientes, itens, valorTotal, ehPermuta }: ContratoResumoProps) {
   const contratoId = contrato.id;
   const status = contrato.status;
+  const clienteVinculado = clientes.find((c) => c.id === contrato.cliente_id) ?? null;
   const [pending, startTransition] = useTransition();
   const grupos = agruparPorSetor(itens);
   const totalItens = itens.reduce((acc, i) => acc + i.quantidade, 0);
@@ -91,7 +93,7 @@ export function ContratoResumo({ contrato, clientes, itens, valorTotal, ehPermut
           cliente_endereco: contrato.contratante_endereco ?? "",
           proposta_id: "",
           contrato_id: contratoId,
-          descricao: `Referente ao contrato${contrato.numero_cliente ? ` nº ${contrato.numero_cliente}` : ""}`,
+          descricao: `Referente ao contrato ${formatarNumeroDocumento(clienteVinculado?.numero, "C", contrato.numero_cliente)}`,
           valor_total: ehPermuta ? contrato.permuta_valor ?? 0 : valorTotal,
         }}
         itensPuxados={itens.map((i) => ({

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { ContratoForm } from "@/components/contratos/ContratoForm";
 import { criarContrato } from "@/app/gestao/contratos/actions";
 import { primeiraDataDoTexto } from "@/lib/contratos/parseData";
+import { formatarNumeroDocumento } from "@/lib/numeracao";
 import type { Cliente } from "@/types/domain";
 
 export default async function NovoContratoPage({
@@ -77,12 +78,14 @@ export default async function NovoContratoPage({
               className="flex-1 rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
             >
               <option value="">Nenhuma proposta selecionada</option>
-              {propostasDisponiveis.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {(p as unknown as { clientes?: { nome: string } }).clientes?.nome ?? "Proposta"}
-                  {p.numero_cliente ? ` · nº ${p.numero_cliente}` : ""}
-                </option>
-              ))}
+              {propostasDisponiveis.map((p) => {
+                const cliente = (p as unknown as { clientes?: { nome: string; numero: number } }).clientes;
+                return (
+                  <option key={p.id} value={p.id}>
+                    {cliente?.nome ?? "Proposta"} · {formatarNumeroDocumento(cliente?.numero, "P", p.numero_cliente)}
+                  </option>
+                );
+              })}
             </select>
             <Button type="submit" variant="secondary">
               Puxar
