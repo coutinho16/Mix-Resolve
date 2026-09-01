@@ -1,10 +1,17 @@
 import Link from "next/link";
 import { addDays, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { AlertTriangle, Calendar, PackageSearch, Plus, Users } from "lucide-react";
+import { AlertTriangle, Calendar, PackageSearch, Plus, Receipt, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { formatarNumeroDocumento } from "@/lib/numeracao";
+import type { TipoFinanceiro } from "@/types/domain";
+
+const rotuloTipoFinanceiro: Record<TipoFinanceiro, string> = {
+  fatura: "Fatura",
+  recibo: "Recibo",
+};
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -15,6 +22,7 @@ export default async function DashboardPage() {
     { data: proximosEventos },
     { data: conflitos },
     { data: equipamentos },
+    { data: pagamentosPendentes },
   ] = await Promise.all([
     supabase
       .from("eventos")
@@ -25,6 +33,11 @@ export default async function DashboardPage() {
       .order("data_inicio"),
     supabase.from("v_conflitos_agenda").select("*").gte("data", hoje),
     supabase.from("equipamentos").select("*").eq("ativo", true),
+    supabase
+      .from("financeiro")
+      .select("*, clientes(numero)")
+      .in("status", ["rascunho", "emitido"])
+      .order("vencimento", { ascending: true, nullsFirst: false }),
   ]);
 
   const estoqueBaixo = (equipamentos ?? []).filter((e) => {
@@ -125,6 +138,45 @@ export default async function DashboardPage() {
               <p className="px-2 text-sm text-neutro-1">
                 Nenhum equipamento abaixo do estoque mínimo.
               </p>
+            )}
+          </ul>
+        </Card>
+
+        <Card className="lg:col-span-2">
+          <h2 className="mb-3 flex items-center gap-2 font-titulo text-sm font-semibold uppercase tracking-wide text-em-uso">
+            <Receipt size={16} />
+            Pagamentos pendentes
+          </h2>
+          <ul className="flex flex-col gap-2">
+            {(pagamentosPendentes ?? []).map((f) => {
+              const cliente = (f as unknown as { clientes?: { numero: number } }).clientes;
+              const vencido = f.vencimento && f.vencimento < hoje;
+              return (
+                <li key={f.id}>
+                  <Link
+                    href={`/gestao/financeiro/${f.id}`}
+                    className={`flex items-center justify-between rounded-lg px-3 py-2 text-sm hover:bg-neutro-3 ${
+                      vencido ? "bg-conflito/10" : "bg-em-uso/10"
+                    }`}
+                  >
+                    <span className="text-preto">
+                      {rotuloTipoFinanceiro[f.tipo]}{" "}
+                      {formatarNumeroDocumento(cliente?.numero, f.tipo === "fatura" ? "N" : "R", f.numero_cliente)}
+                      <span className="ml-2 text-neutro-1">
+                        {f.cliente_nome || "Sem cliente"} · R$ {f.valor_total.toFixed(2)}
+                      </span>
+                    </span>
+                    <span className={`font-medium ${vencido ? "text-conflito" : "text-preto"}`}>
+                      {f.vencimento
+                        ? format(new Date(`${f.vencimento}T00:00:00`), "dd/MM/yyyy", { locale: ptBR })
+                        : "Sem vencimento"}
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
+            {(!pagamentosPendentes || pagamentosPendentes.length === 0) && (
+              <p className="px-2 text-sm text-neutro-1">Nenhum pagamento pendente.</p>
             )}
           </ul>
         </Card>
