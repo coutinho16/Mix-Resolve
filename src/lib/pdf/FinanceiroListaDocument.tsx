@@ -58,7 +58,7 @@ const rotuloStatus: Record<StatusFinanceiro, string> = {
   cancelado: "Cancelado",
 };
 
-const estiloStatus: Record<StatusFinanceiro, object> = {
+const estiloStatus: Record<StatusFinanceiro, typeof styles.statusPendente> = {
   rascunho: styles.statusPendente,
   emitido: styles.statusPendente,
   pago: styles.statusPago,
