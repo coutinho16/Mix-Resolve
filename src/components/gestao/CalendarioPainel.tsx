@@ -19,10 +19,11 @@ import {
   subWeeks,
 } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { ChevronLeft, ChevronRight, MapPin, Clock, Download } from "lucide-react";
+import { ChevronLeft, ChevronRight, MapPin, Clock, Download, Plus } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
+import { NovoEventoRapidoForm } from "@/components/gestao/NovoEventoRapidoForm";
 import type { Evento } from "@/types/domain";
 
 interface CalendarioPainelProps {
@@ -43,6 +44,7 @@ export function CalendarioPainel({ eventos, mesInicial }: CalendarioPainelProps)
   const [modo, setModo] = useState<Modo>("mes");
   const [foco, setFoco] = useState(mesInicial);
   const [selecionado, setSelecionado] = useState<Date | null>(null);
+  const [novoEventoData, setNovoEventoData] = useState<Date | null>(null);
   const [mostrarPersonalizado, setMostrarPersonalizado] = useState(false);
   const [rangeInicio, setRangeInicio] = useState("");
   const [rangeFim, setRangeFim] = useState("");
@@ -78,6 +80,11 @@ export function CalendarioPainel({ eventos, mesInicial }: CalendarioPainelProps)
 
   function abrirEvento(id: string) {
     router.push(`/gestao/eventos/${id}`);
+  }
+
+  function abrirNovoEvento(dia: Date) {
+    setSelecionado(null);
+    setNovoEventoData(dia);
   }
 
   function navegar(direcao: -1 | 1) {
@@ -176,11 +183,30 @@ export function CalendarioPainel({ eventos, mesInicial }: CalendarioPainelProps)
                   <button
                     key={dia.toISOString()}
                     onClick={() => setSelecionado(dia)}
-                    className={`flex min-h-[76px] w-full flex-col items-start gap-1 overflow-hidden rounded-lg border p-1.5 text-left text-xs ${
+                    className={`group relative flex min-h-[76px] w-full flex-col items-start gap-1 overflow-hidden rounded-lg border p-1.5 text-left text-xs ${
                       ativo ? "border-laranja" : "border-transparent"
                     } ${doMes ? "" : "opacity-40"} hover:bg-neutro-3`}
                   >
                     <span className="font-medium text-preto">{format(dia, "d")}</span>
+                    <span
+                      role="button"
+                      tabIndex={0}
+                      onClick={(ev) => {
+                        ev.stopPropagation();
+                        abrirNovoEvento(dia);
+                      }}
+                      onKeyDown={(ev) => {
+                        if (ev.key === "Enter" || ev.key === " ") {
+                          ev.stopPropagation();
+                          abrirNovoEvento(dia);
+                        }
+                      }}
+                      className="absolute right-1 top-1 rounded-md p-0.5 text-neutro-1 opacity-0 hover:bg-neutro-2 hover:text-laranja group-hover:opacity-100"
+                      aria-label="Adicionar evento"
+                      title="Adicionar evento"
+                    >
+                      <Plus size={12} />
+                    </span>
                     <div className="flex w-full min-w-0 flex-col gap-0.5">
                       {evs.slice(0, 2).map((e) => (
                         <span
@@ -225,9 +251,20 @@ export function CalendarioPainel({ eventos, mesInicial }: CalendarioPainelProps)
                     <span className="text-[10px] font-medium uppercase text-neutro-1">
                       {format(dia, "EEE", { locale: ptBR })}
                     </span>
-                    <span className={`text-sm font-semibold ${hoje ? "text-laranja" : "text-preto"}`}>
-                      {format(dia, "d")}
-                    </span>
+                    <div className="flex items-center gap-1">
+                      <span className={`text-sm font-semibold ${hoje ? "text-laranja" : "text-preto"}`}>
+                        {format(dia, "d")}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => abrirNovoEvento(dia)}
+                        className="rounded-md p-0.5 text-neutro-1 hover:bg-neutro-3 hover:text-laranja"
+                        aria-label="Adicionar evento"
+                        title="Adicionar evento"
+                      >
+                        <Plus size={12} />
+                      </button>
+                    </div>
                   </div>
                   <div className="flex min-h-[60px] flex-col gap-1">
                     {evs.map((e) => (
@@ -262,6 +299,15 @@ export function CalendarioPainel({ eventos, mesInicial }: CalendarioPainelProps)
 
         {modo === "dia" && (
           <div className="flex flex-col gap-2">
+            <Button
+              type="button"
+              variant="secondary"
+              className="self-start"
+              onClick={() => abrirNovoEvento(foco)}
+            >
+              <Plus size={16} />
+              Adicionar evento
+            </Button>
             {eventosDoDia(foco).length === 0 && montagemDoDia(foco).length === 0 && (
               <p className="rounded-lg border border-dashed border-neutro-2 px-3 py-6 text-center text-sm text-neutro-1">
                 Nenhum evento neste dia.
@@ -349,6 +395,16 @@ export function CalendarioPainel({ eventos, mesInicial }: CalendarioPainelProps)
         titulo={selecionado ? format(selecionado, "dd 'de' MMMM", { locale: ptBR }) : ""}
         onFechar={() => setSelecionado(null)}
       >
+        <Button
+          type="button"
+          variant="secondary"
+          className="mb-3"
+          onClick={() => selecionado && abrirNovoEvento(selecionado)}
+        >
+          <Plus size={16} />
+          Adicionar evento
+        </Button>
+
         {eventosSelecionados.length === 0 && montagensSelecionadas.length === 0 && (
           <p className="text-sm text-neutro-1">Nenhum evento neste dia.</p>
         )}
@@ -385,6 +441,18 @@ export function CalendarioPainel({ eventos, mesInicial }: CalendarioPainelProps)
             </li>
           ))}
         </ul>
+      </Modal>
+
+      <Modal
+        aberto={novoEventoData !== null}
+        titulo={
+          novoEventoData
+            ? `Novo evento · ${format(novoEventoData, "dd 'de' MMMM", { locale: ptBR })}`
+            : "Novo evento"
+        }
+        onFechar={() => setNovoEventoData(null)}
+      >
+        {novoEventoData && <NovoEventoRapidoForm data={ymd(novoEventoData)} />}
       </Modal>
     </>
   );
