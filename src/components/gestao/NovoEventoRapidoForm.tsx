@@ -53,6 +53,21 @@ export function NovoEventoRapidoForm({ data }: { data: string }) {
         </div>
       </div>
 
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="data_montagem" className="text-sm font-medium text-preto">
+          Data de montagem <span className="font-normal text-neutro-1">(opcional)</span>
+        </label>
+        <input
+          id="data_montagem"
+          name="data_montagem"
+          type="date"
+          className="rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
+        />
+        <p className="text-xs text-neutro-1">
+          Enquanto não for definida, o evento aparece com um aviso no calendário.
+        </p>
+      </div>
+
       <p className="text-xs text-neutro-1">
         Só o nome e a data são obrigatórios. Cliente, local e o resto dos detalhes podem
         ser preenchidos depois, na página do evento.

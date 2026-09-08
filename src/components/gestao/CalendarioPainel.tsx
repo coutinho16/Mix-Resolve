@@ -19,7 +19,7 @@ import {
   subWeeks,
 } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { ChevronLeft, ChevronRight, MapPin, Clock, Download, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, MapPin, Clock, Download, Plus, TriangleAlert } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
@@ -37,6 +37,18 @@ const diasSemana = ["dom", "seg", "ter", "qua", "qui", "sex", "sáb"];
 
 function ymd(d: Date) {
   return format(d, "yyyy-MM-dd");
+}
+
+function AvisoMontagem() {
+  return (
+    <span
+      className="flex items-center gap-1 rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-medium text-amber-600"
+      title="Falta definir a data de montagem"
+    >
+      <TriangleAlert size={11} />
+      Montagem não definida
+    </span>
+  );
 }
 
 export function CalendarioPainel({ eventos, mesInicial }: CalendarioPainelProps) {
@@ -211,10 +223,17 @@ export function CalendarioPainel({ eventos, mesInicial }: CalendarioPainelProps)
                       {evs.slice(0, 2).map((e) => (
                         <span
                           key={e.id}
-                          className="block w-full truncate rounded bg-laranja px-1.5 py-0.5 text-[10px] font-medium text-branco-puro"
+                          className="flex w-full items-center gap-1 truncate rounded bg-laranja px-1.5 py-0.5 text-[10px] font-medium text-branco-puro"
                           title={e.nome}
                         >
-                          {e.nome}
+                          {!e.data_montagem && (
+                            <TriangleAlert
+                              size={10}
+                              className="shrink-0"
+                              aria-label="Falta definir data de montagem"
+                            />
+                          )}
+                          <span className="truncate">{e.nome}</span>
                         </span>
                       ))}
                       {montagens.slice(0, evs.length > 0 ? 1 : 2).map((e) => (
@@ -271,10 +290,17 @@ export function CalendarioPainel({ eventos, mesInicial }: CalendarioPainelProps)
                       <button
                         key={e.id}
                         onClick={() => abrirEvento(e.id)}
-                        className="block w-full truncate rounded bg-laranja px-1.5 py-1 text-left text-[10px] font-medium text-branco-puro hover:opacity-90"
+                        className="flex w-full items-center gap-1 truncate rounded bg-laranja px-1.5 py-1 text-left text-[10px] font-medium text-branco-puro hover:opacity-90"
                         title={e.nome}
                       >
-                        {e.nome}
+                        {!e.data_montagem && (
+                          <TriangleAlert
+                            size={10}
+                            className="shrink-0"
+                            aria-label="Falta definir data de montagem"
+                          />
+                        )}
+                        <span className="truncate">{e.nome}</span>
                       </button>
                     ))}
                     {montagens.map((e) => (
@@ -319,7 +345,10 @@ export function CalendarioPainel({ eventos, mesInicial }: CalendarioPainelProps)
                 onClick={() => abrirEvento(e.id)}
                 className="flex w-full flex-col items-start gap-1 rounded-lg bg-laranja/10 p-3 text-left text-sm hover:bg-laranja/20"
               >
-                <span className="font-medium text-preto">{e.nome}</span>
+                <span className="flex items-center gap-1.5">
+                  <span className="font-medium text-preto">{e.nome}</span>
+                  {!e.data_montagem && <AvisoMontagem />}
+                </span>
                 <span className="flex items-center gap-1.5 text-xs text-neutro-1">
                   <MapPin size={12} />
                   {e.local ?? "Local não definido"}
@@ -416,7 +445,10 @@ export function CalendarioPainel({ eventos, mesInicial }: CalendarioPainelProps)
                 onClick={() => abrirEvento(e.id)}
                 className="flex w-full flex-col items-start gap-1 rounded-lg bg-laranja/10 p-3 text-left text-sm hover:bg-laranja/20"
               >
-                <span className="font-medium text-preto">{e.nome}</span>
+                <span className="flex items-center gap-1.5">
+                  <span className="font-medium text-preto">{e.nome}</span>
+                  {!e.data_montagem && <AvisoMontagem />}
+                </span>
                 <span className="flex items-center gap-1.5 text-xs text-neutro-1">
                   <MapPin size={12} />
                   {e.local ?? "Local não definido"}
