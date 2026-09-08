@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { Button } from "@/components/ui/Button";
+import { NovoClienteModal } from "@/components/clientes/NovoClienteModal";
 import type { Cliente, Evento } from "@/types/domain";
 import type { EventoActionState } from "@/app/gestao/eventos/actions";
 
@@ -18,12 +19,14 @@ interface EventoFormProps {
 
 const estadoInicial: EventoActionState = {};
 
-export function EventoForm({ clientes, evento, action }: EventoFormProps) {
+export function EventoForm({ clientes: clientesIniciais, evento, action }: EventoFormProps) {
   const [state, formAction, pending] = useActionState(action, estadoInicial);
   const [multiDia, setMultiDia] = useState(
     evento ? evento.data_inicio !== evento.data_fim : false
   );
   const [dataInicio, setDataInicio] = useState(evento?.data_inicio ?? "");
+  const [clientes, setClientes] = useState(clientesIniciais);
+  const [clienteId, setClienteId] = useState(evento?.cliente_id ?? "");
 
   return (
     <form action={formAction} className="flex flex-col gap-5">
@@ -33,19 +36,28 @@ export function EventoForm({ clientes, evento, action }: EventoFormProps) {
         <label htmlFor="cliente_id" className="text-sm font-medium text-preto">
           Cliente
         </label>
-        <select
-          id="cliente_id"
-          name="cliente_id"
-          defaultValue={evento?.cliente_id ?? ""}
-          className="rounded-lg border border-neutro-2 px-3 py-2 text-sm outline-none focus:border-laranja"
-        >
-          <option value="">Sem cliente vinculado</option>
-          {clientes.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.nome}
-            </option>
-          ))}
-        </select>
+        <div className="flex gap-2">
+          <select
+            id="cliente_id"
+            name="cliente_id"
+            value={clienteId}
+            onChange={(e) => setClienteId(e.target.value)}
+            className="flex-1 rounded-lg border border-neutro-2 px-3 py-2 text-sm text-preto outline-none focus:border-laranja"
+          >
+            <option value="">Sem cliente vinculado</option>
+            {clientes.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.nome}
+              </option>
+            ))}
+          </select>
+          <NovoClienteModal
+            onCriado={(cliente) => {
+              setClientes((prev) => [...prev, cliente].sort((a, b) => a.nome.localeCompare(b.nome)));
+              setClienteId(cliente.id);
+            }}
+          />
+        </div>
       </div>
 
       <label className="flex items-center gap-2 text-sm font-medium text-preto">
